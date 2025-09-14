@@ -94,6 +94,9 @@ function setActiveEditCharacter(charName: string) {
          displaySkillValue("focus", skillName, (selectedCharacter.skills[skillName] as Skill).focus);
       }
    }
+
+   document.querySelector<HTMLInputElement>("#aqua_hyranis_editor")!.value = selectedCharacter.aqua_ghyranis.toString();
+
 }
 
 function onCharacterSelected(this: HTMLSelectElement) {
@@ -219,12 +222,6 @@ function setCharacterSkillFocus(name: string, level: number) {
 function setupSkillTable() {
    let placeHolderSkillTable = new SkillTable();
 
-   // <div class="flex flex-row gap-5">
-   //   <button id="set_arcana_training_to_1" class="size-5 border-1 border-black bg-white"></button>
-   //   <button id="set_arcana_training_to_2" class="size-5 border-1 border-black bg-white"></button>
-   //   <button id="set_arcana_training_to_3" class="size-5 border-1 border-black bg-white"></button>
-   // </div>
-
    let skillTableNameColumn = document.querySelector<HTMLDivElement>("#skill_table_name_column")!;
    let skillTableTrainingColumn = document.querySelector<HTMLDivElement>("#skill_table_training_column")!;
    let skillTableFocusColumn = document.querySelector<HTMLDivElement>("#skill_table_focus_column")!;
@@ -282,6 +279,40 @@ function setupSkillTable() {
 
 setupSkillTable()
 
+// Character Name
+function setCharacterName(this: HTMLInputElement): boolean {
+   if (globalCharacterDictionary.get(this.value) !== undefined) {
+      alert("Error: Character already exists.");
+      return false;
+   }
+
+   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+
+   selectedCharacter.name = this.value;
+
+   globalCharacterDictionary.delete(selectedCharacterName)!;
+   globalCharacterDictionary.set(selectedCharacter.name, selectedCharacter);
+
+
+   let character_list = document.querySelector<HTMLSelectElement>("#character_list_dropdown")!;
+
+   for (var optionChild of character_list.children) {
+      console.log((optionChild as HTMLOptionElement).value);
+      if ((optionChild as HTMLOptionElement).value == selectedCharacterName) {
+         console.log("Hey");
+         (optionChild as HTMLOptionElement).value = selectedCharacter.name;
+         (optionChild as HTMLOptionElement).innerText = selectedCharacter.name;
+         break;
+      }
+   }
+
+   selectedCharacterName = selectedCharacter.name;
+   character_list.value = selectedCharacterName;
+
+   return true;
+}
+document.querySelector<HTMLInputElement>("#character_name_input")!.addEventListener("input", setCharacterName);
+
 // Attributes
 function setAttributeValue(name: string, value: number) {
    let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
@@ -307,3 +338,12 @@ function setSoulValue(this: HTMLInputElement) {
 document.querySelector<HTMLInputElement>("#body_input_field")!.addEventListener("input", setBodyValue)
 document.querySelector<HTMLInputElement>("#mind_input_field")!.addEventListener("input", setMindValue)
 document.querySelector<HTMLInputElement>("#soul_input_field")!.addEventListener("input", setSoulValue)
+
+// Aqua Ghyranis
+function setAquaGhyranis(this: HTMLInputElement) {
+   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+
+   selectedCharacter.aqua_ghyranis = +this.value;
+}
+
+document.querySelector<HTMLInputElement>("#aqua_hyranis_editor")!.addEventListener("input", setAquaGhyranis)
