@@ -1,0 +1,12 @@
+{
+    "name": "SquigRodeo",
+    "version": "1.0.0",
+    "manifest_version": 1,
+    "action": {
+        "title": "SquigRodeo - Soulbound Companion",
+        "icon": "/icon.svg",
+        "popover": "/",
+        "height": 800,
+        "width": 600
+    }
+}
