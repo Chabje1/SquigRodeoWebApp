@@ -12,6 +12,8 @@ export class Skill {
 }
 
 export class SkillTable {
+    [key: string]: Skill | (() => number);
+
     arcana: Skill;
     athletics: Skill;
     awareness: Skill;
@@ -121,6 +123,8 @@ export class SkillTable {
 }
 
 export class Attributes {
+    [key: string]: number | (() => number);
+
     body: number;
     mind: number;
     soul: number;

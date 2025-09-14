@@ -1,4 +1,4 @@
-import { CharacterSheet, SkillTable } from "./CharacterSheet";
+import { CharacterSheet, SkillTable, Skill } from "./CharacterSheet";
 import { toTitleCase } from "./utilities";
 
 // Menu Navigation Button Logic
@@ -89,8 +89,10 @@ function setActiveEditCharacter(charName: string) {
    document.querySelector<HTMLInputElement>("#total_xp_input")!.valueAsNumber = selectedCharacter.total_xp;
 
    for (const skillName in selectedCharacter.skills) {
-      displaySkillValue("training", skillName, selectedCharacter.skills[skillName].training);
-      displaySkillValue("focus", skillName, selectedCharacter.skills[skillName].focus);
+      if (selectedCharacter.skills[skillName] instanceof Skill) {
+         displaySkillValue("training", skillName, (selectedCharacter.skills[skillName] as Skill).training);
+         displaySkillValue("focus", skillName, (selectedCharacter.skills[skillName] as Skill).focus);
+      }
    }
 }
 
@@ -160,7 +162,7 @@ function updateRemainingXp() {
    document.querySelector<HTMLLabelElement>("#remaining_xp_text")!.innerText = remaining_xp.toString();
 }
 
-function totalXpInputEvent(this: HTMLInputElement, ev: Event) {
+function totalXpInputEvent(this: HTMLInputElement) {
    let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
 
    selectedCharacter.total_xp = this.valueAsNumber;
@@ -189,11 +191,11 @@ function displaySkillValue(valueType: string, name: string, level: number) {
 function setCharacterSkillTraining(name: string, level: number) {
    let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
 
-   if (selectedCharacter.skills[name].training == level) {
+   if ((selectedCharacter.skills[name] as Skill).training == level) {
       level = 0;
    }
 
-   selectedCharacter.skills[name].training = level;
+   (selectedCharacter.skills[name] as Skill).training = level;
 
    displaySkillValue("training", name, level);
 
@@ -203,11 +205,11 @@ function setCharacterSkillTraining(name: string, level: number) {
 function setCharacterSkillFocus(name: string, level: number) {
    let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
 
-   if (selectedCharacter.skills[name].focus == level) {
+   if ((selectedCharacter.skills[name] as Skill).focus == level) {
       level = 0;
    }
 
-   selectedCharacter.skills[name].focus = level;
+   (selectedCharacter.skills[name] as Skill).focus = level;
 
    displaySkillValue("focus", name, level);
 
@@ -229,52 +231,53 @@ function setupSkillTable() {
 
    for (const skillName in placeHolderSkillTable) {
 
-      // Add skill names
-      let textElement = document.createElement("p");
-      textElement.classList.add("font-bold", "text-sm", "text-center");
+      if (placeHolderSkillTable[skillName] instanceof Skill) {
 
-      textElement.textContent = toTitleCase(skillName.replace("_", " "));
+         // Add skill names
+         let textElement = document.createElement("p");
+         textElement.classList.add("font-bold", "text-sm", "text-center");
 
-      skillTableNameColumn.appendChild(textElement);
+         textElement.textContent = toTitleCase(skillName.replace("_", " "));
 
-      // Add skill training buttons
-      let trainingDiv = document.createElement("div");
-      trainingDiv.classList.add("flex", "flex-row", "gap-5");
+         skillTableNameColumn.appendChild(textElement);
 
-      for (let index = 1; index <= 3; index++) {
-         let trainingButton = document.createElement("button");
+         // Add skill training buttons
+         let trainingDiv = document.createElement("div");
+         trainingDiv.classList.add("flex", "flex-row", "gap-5");
 
-         trainingButton.id = "set_" + skillName + "_training_to_" + index.toString();
+         for (let index = 1; index <= 3; index++) {
+            let trainingButton = document.createElement("button");
 
-         trainingButton.classList.add("size-5", "border-1", "border-black", "bg-white");
+            trainingButton.id = "set_" + skillName + "_training_to_" + index.toString();
 
-         trainingButton.addEventListener("click", () => { setCharacterSkillTraining(skillName, index); });
+            trainingButton.classList.add("size-5", "border-1", "border-black", "bg-white");
 
-         trainingDiv.appendChild(trainingButton);
+            trainingButton.addEventListener("click", () => { setCharacterSkillTraining(skillName, index); });
+
+            trainingDiv.appendChild(trainingButton);
+         }
+
+         skillTableTrainingColumn.appendChild(trainingDiv);
+
+         // Add skill focus buttons
+         let focusDiv = document.createElement("div");
+         focusDiv.classList.add("flex", "flex-row", "gap-5");
+
+         for (let index = 1; index <= 3; index++) {
+            let focusButton = document.createElement("button");
+
+            focusButton.id = "set_" + skillName + "_focus_to_" + index.toString();
+
+            focusButton.classList.add("size-5", "border-1", "border-black", "bg-white");
+
+            focusButton.addEventListener("click", () => { setCharacterSkillFocus(skillName, index); });
+
+            focusDiv.appendChild(focusButton);
+         }
+
+         skillTableFocusColumn.appendChild(focusDiv);
       }
-
-      skillTableTrainingColumn.appendChild(trainingDiv);
-
-      // Add skill focus buttons
-      let focusDiv = document.createElement("div");
-      focusDiv.classList.add("flex", "flex-row", "gap-5");
-
-      for (let index = 1; index <= 3; index++) {
-         let focusButton = document.createElement("button");
-
-         focusButton.id = "set_" + skillName + "_focus_to_" + index.toString();
-
-         focusButton.classList.add("size-5", "border-1", "border-black", "bg-white");
-
-         focusButton.addEventListener("click", () => { setCharacterSkillFocus(skillName, index); });
-
-         focusDiv.appendChild(focusButton);
-      }
-
-      skillTableFocusColumn.appendChild(focusDiv);
    }
-
-
 }
 
 setupSkillTable()
@@ -289,15 +292,15 @@ function setAttributeValue(name: string, value: number) {
    updateRemainingXp();
 }
 
-function setBodyValue(this: HTMLInputElement, ev: Event) {
+function setBodyValue(this: HTMLInputElement) {
    setAttributeValue("body", +this.value);
 }
 
-function setMindValue(this: HTMLInputElement, ev: Event) {
+function setMindValue(this: HTMLInputElement) {
    setAttributeValue("mind", +this.value);
 }
 
-function setSoulValue(this: HTMLInputElement, ev: Event) {
+function setSoulValue(this: HTMLInputElement) {
    setAttributeValue("soul", +this.value);
 }
 
