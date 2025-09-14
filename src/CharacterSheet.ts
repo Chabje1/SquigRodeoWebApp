@@ -146,6 +146,18 @@ export class Attributes {
     }
 }
 
+export class Talent {
+    name: string;
+    cost: number;
+    description: string;
+
+    constructor(name: string) {
+        this.name = name;
+        this.cost = 2;
+        this.description = "";
+    }
+}
+
 export class CharacterSheet {
     name: string;
     remaining_xp: number;
@@ -160,6 +172,7 @@ export class CharacterSheet {
     has_shield: boolean;
     short_term_goal: string;
     long_term_goal: string;
+    talents: Map<string, Talent>;
 
     constructor(name: string) {
         this.name = name;
@@ -173,8 +186,9 @@ export class CharacterSheet {
         this.remaining_toughness = 0;
         this.remaining_wounds = 0;
         this.has_shield = false;
-        this.short_term_goal = ""
-        this.long_term_goal = ""
+        this.short_term_goal = "";
+        this.long_term_goal = "";
+        this.talents = new Map<string, Talent>();
     }
 
     public calculateUsedXp(): number {
@@ -182,6 +196,10 @@ export class CharacterSheet {
 
         totalUsed += this.attributes.getUsedXp();
         totalUsed += this.skills.getUsedXp();
+
+        for (const talent of this.talents) {
+            totalUsed += talent[1].cost;
+        }
 
         return totalUsed;
     }

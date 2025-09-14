@@ -1,4 +1,4 @@
-import { CharacterSheet, SkillTable, Skill } from "./CharacterSheet";
+import { CharacterSheet, SkillTable, Skill, Talent } from "./CharacterSheet";
 import { toTitleCase } from "./utilities";
 
 // Menu Navigation Button Logic
@@ -97,6 +97,26 @@ function setActiveEditCharacter(charName: string) {
 
    document.querySelector<HTMLInputElement>("#aqua_hyranis_editor")!.value = selectedCharacter.aqua_ghyranis.toString();
 
+   document.querySelector<HTMLTextAreaElement>("#character_editor_stg_input")!.value = selectedCharacter.short_term_goal;
+   document.querySelector<HTMLTextAreaElement>("#character_editor_ltg_input")!.value = selectedCharacter.long_term_goal;
+
+   document.querySelector<HTMLDivElement>("#talent_editor_panel")!.classList.add("hidden");
+   selectedTalentName = ""
+
+   let talent_list = document.querySelector<HTMLSelectElement>("#editor_talent_list_dropdown")!;
+
+   while (talent_list.lastChild) {
+      talent_list.removeChild(talent_list.lastChild);
+   }
+
+   for (const talent of selectedCharacter.talents) {
+      let newOption: HTMLOptionElement = document.createElement("option");
+      newOption.value = talent[1].name;
+      newOption.innerText = talent[1].name;
+      talent_list.appendChild(newOption);
+   }
+
+   talent_list.value = "";
 }
 
 function onCharacterSelected(this: HTMLSelectElement) {
@@ -345,3 +365,151 @@ function setAquaGhyranis(this: HTMLInputElement) {
 }
 
 document.querySelector<HTMLInputElement>("#aqua_hyranis_editor")!.addEventListener("input", setAquaGhyranis)
+
+// Long/Short Term Goals
+function setShortTermGoal(this: HTMLTextAreaElement) {
+   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+
+   selectedCharacter.short_term_goal = this.value;
+}
+
+function setLongTermGoal(this: HTMLTextAreaElement) {
+   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+
+   selectedCharacter.long_term_goal = this.value;
+}
+
+document.querySelector<HTMLTextAreaElement>("#character_editor_stg_input")!.addEventListener("input", setShortTermGoal)
+document.querySelector<HTMLTextAreaElement>("#character_editor_ltg_input")!.addEventListener("input", setLongTermGoal)
+
+// Talents Add/Remove
+let selectedTalentName = "";
+
+function setActiveEditTalent(name: string) {
+   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+   selectedTalentName = name;
+
+   let selectedTalent = selectedCharacter.talents.get(selectedTalentName)!;
+
+   document.querySelector<HTMLDivElement>("#talent_editor_panel")!.classList.remove("hidden");
+
+   document.querySelector<HTMLInputElement>("#editor_talent_name")!.value = selectedTalent.name;
+   document.querySelector<HTMLInputElement>("#editor_talent_cost")!.value = selectedTalent.cost.toString();
+   document.querySelector<HTMLTextAreaElement>("#editor_talent_description")!.value = selectedTalent.description;
+}
+
+function onTalentSelected(this: HTMLSelectElement) {
+   setActiveEditTalent(this.value);
+}
+
+function addTalent() {
+   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+
+   let newOption: HTMLOptionElement = document.createElement("option");
+
+   let name = prompt("Talent Name")!;
+
+   while (selectedCharacter.talents.has(name)) {
+      alert("Error: Talent already exists.");
+      name = prompt("Talent Name")!;
+   }
+
+   // Character List Update
+   selectedCharacter.talents.set(name, new Talent(name));
+
+   // Character Dropdown
+   newOption.value = name;
+   newOption.innerText = name;
+
+   let talent_list = document.querySelector<HTMLSelectElement>("#editor_talent_list_dropdown")!;
+
+   talent_list.appendChild(newOption);
+   talent_list.value = name;
+
+   // Activate Talent
+   setActiveEditTalent(name);
+
+   updateRemainingXp();
+}
+
+function removeTalent() {
+   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+   selectedCharacter.talents.delete(selectedTalentName);
+
+   let talent_list = document.querySelector<HTMLSelectElement>("#editor_talent_list_dropdown")!;
+
+   let selectedOptions = talent_list.selectedOptions;
+
+   for (let index = 0; index < selectedOptions.length; index++) {
+      talent_list.removeChild(selectedOptions[index]);
+   }
+
+   if (talent_list.childElementCount > 0) {
+      let newSelected = talent_list.options[0];
+
+      talent_list.value = newSelected.value;
+      setActiveEditTalent(newSelected.value);
+   }
+   else {
+      selectedTalentName = "";
+      talent_list.value = "";
+      document.querySelector<HTMLDivElement>("#talent_editor_panel")!.classList.add("hidden");
+   }
+
+   updateRemainingXp();
+}
+
+document.querySelector<HTMLSelectElement>("#editor_talent_list_dropdown")!.addEventListener("change", onTalentSelected)
+document.querySelector<HTMLButtonElement>("#add_talent")!.addEventListener("click", addTalent)
+document.querySelector<HTMLButtonElement>("#remove_talent")!.addEventListener("click", removeTalent)
+
+// Talent Editor
+function setTalentName(this: HTMLInputElement): boolean {
+   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+
+   if (selectedCharacter.talents.get(this.value) !== undefined) {
+      alert("Error: Talent already exists.");
+      return false;
+   }
+   let selectedTalent = selectedCharacter.talents.get(selectedTalentName)!;
+
+   selectedTalent.name = this.value;
+
+   selectedCharacter.talents.delete(selectedTalentName);
+   selectedCharacter.talents.set(selectedTalent.name, selectedTalent);
+
+   let talent_list = document.querySelector<HTMLSelectElement>("#editor_talent_list_dropdown")!;
+
+   for (var optionChild of talent_list.children) {
+      if ((optionChild as HTMLOptionElement).value == selectedTalentName) {
+         (optionChild as HTMLOptionElement).value = selectedTalent.name;
+         (optionChild as HTMLOptionElement).innerText = selectedTalent.name;
+         break;
+      }
+   }
+
+   selectedTalentName = selectedTalent.name;
+   talent_list.value = selectedTalentName;
+
+   return true;
+}
+
+function setTalentCost(this: HTMLInputElement) {
+   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+   let selectedTalent = selectedCharacter.talents.get(selectedTalentName)!;
+
+   selectedTalent.cost = +this.value;
+
+   updateRemainingXp();
+}
+
+function setTalentDescription(this: HTMLTextAreaElement) {
+   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+   let selectedTalent = selectedCharacter.talents.get(selectedTalentName)!;
+
+   selectedTalent.description = this.value;
+}
+
+document.querySelector<HTMLInputElement>("#editor_talent_name")!.addEventListener("input", setTalentName)
+document.querySelector<HTMLInputElement>("#editor_talent_cost")!.addEventListener("input", setTalentCost)
+document.querySelector<HTMLTextAreaElement>("#editor_talent_description")!.addEventListener("input", setTalentDescription)
