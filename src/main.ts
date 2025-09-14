@@ -297,9 +297,7 @@ function setCharacterName(this: HTMLInputElement): boolean {
    let character_list = document.querySelector<HTMLSelectElement>("#character_list_dropdown")!;
 
    for (var optionChild of character_list.children) {
-      console.log((optionChild as HTMLOptionElement).value);
       if ((optionChild as HTMLOptionElement).value == selectedCharacterName) {
-         console.log("Hey");
          (optionChild as HTMLOptionElement).value = selectedCharacter.name;
          (optionChild as HTMLOptionElement).innerText = selectedCharacter.name;
          break;
