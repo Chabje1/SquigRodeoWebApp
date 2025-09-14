@@ -12,7 +12,7 @@ export class Skill {
 }
 
 export class SkillTable {
-    [key: string]: Skill | (() => number);
+    [key: string]: Skill;
 
     arcana: Skill;
     athletics: Skill;
@@ -65,61 +65,6 @@ export class SkillTable {
         this.theology = new Skill();
         this.weapon_skill = new Skill();
     }
-
-    public getUsedXp(): number {
-        let totalUsed = 0;
-
-        totalUsed += SKILL_COST_PER_LEVEL[this.arcana.training];
-        totalUsed += SKILL_COST_PER_LEVEL[this.arcana.focus];
-        totalUsed += SKILL_COST_PER_LEVEL[this.athletics.training];
-        totalUsed += SKILL_COST_PER_LEVEL[this.athletics.focus];
-        totalUsed += SKILL_COST_PER_LEVEL[this.awareness.training];
-        totalUsed += SKILL_COST_PER_LEVEL[this.awareness.focus];
-        totalUsed += SKILL_COST_PER_LEVEL[this.ballistic_skill.training];
-        totalUsed += SKILL_COST_PER_LEVEL[this.ballistic_skill.focus];
-        totalUsed += SKILL_COST_PER_LEVEL[this.beast_handling.training];
-        totalUsed += SKILL_COST_PER_LEVEL[this.beast_handling.focus];
-        totalUsed += SKILL_COST_PER_LEVEL[this.channelling.training];
-        totalUsed += SKILL_COST_PER_LEVEL[this.channelling.focus];
-        totalUsed += SKILL_COST_PER_LEVEL[this.crafting.training];
-        totalUsed += SKILL_COST_PER_LEVEL[this.crafting.focus];
-        totalUsed += SKILL_COST_PER_LEVEL[this.determination.training];
-        totalUsed += SKILL_COST_PER_LEVEL[this.determination.focus];
-        totalUsed += SKILL_COST_PER_LEVEL[this.devotion.training];
-        totalUsed += SKILL_COST_PER_LEVEL[this.devotion.focus];
-        totalUsed += SKILL_COST_PER_LEVEL[this.dexterity.training];
-        totalUsed += SKILL_COST_PER_LEVEL[this.dexterity.focus];
-        totalUsed += SKILL_COST_PER_LEVEL[this.entertain.training];
-        totalUsed += SKILL_COST_PER_LEVEL[this.entertain.focus];
-        totalUsed += SKILL_COST_PER_LEVEL[this.fortitude.training];
-        totalUsed += SKILL_COST_PER_LEVEL[this.fortitude.focus];
-        totalUsed += SKILL_COST_PER_LEVEL[this.guile.training];
-        totalUsed += SKILL_COST_PER_LEVEL[this.guile.focus];
-        totalUsed += SKILL_COST_PER_LEVEL[this.intimidation.training];
-        totalUsed += SKILL_COST_PER_LEVEL[this.intimidation.focus];
-        totalUsed += SKILL_COST_PER_LEVEL[this.intuition.training];
-        totalUsed += SKILL_COST_PER_LEVEL[this.intuition.focus];
-        totalUsed += SKILL_COST_PER_LEVEL[this.lore.training];
-        totalUsed += SKILL_COST_PER_LEVEL[this.lore.focus];
-        totalUsed += SKILL_COST_PER_LEVEL[this.medicine.training];
-        totalUsed += SKILL_COST_PER_LEVEL[this.medicine.focus];
-        totalUsed += SKILL_COST_PER_LEVEL[this.might.training];
-        totalUsed += SKILL_COST_PER_LEVEL[this.might.focus];
-        totalUsed += SKILL_COST_PER_LEVEL[this.nature.training];
-        totalUsed += SKILL_COST_PER_LEVEL[this.nature.focus];
-        totalUsed += SKILL_COST_PER_LEVEL[this.reflexes.training];
-        totalUsed += SKILL_COST_PER_LEVEL[this.reflexes.focus];
-        totalUsed += SKILL_COST_PER_LEVEL[this.stealth.training];
-        totalUsed += SKILL_COST_PER_LEVEL[this.stealth.focus];
-        totalUsed += SKILL_COST_PER_LEVEL[this.survival.training];
-        totalUsed += SKILL_COST_PER_LEVEL[this.survival.focus];
-        totalUsed += SKILL_COST_PER_LEVEL[this.theology.training];
-        totalUsed += SKILL_COST_PER_LEVEL[this.theology.focus];
-        totalUsed += SKILL_COST_PER_LEVEL[this.weapon_skill.training];
-        totalUsed += SKILL_COST_PER_LEVEL[this.weapon_skill.focus];
-
-        return totalUsed;
-    }
 }
 
 export class Attributes {
@@ -133,16 +78,6 @@ export class Attributes {
         this.body = 1;
         this.mind = 1;
         this.soul = 1;
-    }
-
-    public getUsedXp(): number {
-        let totalUsed = 0;
-
-        totalUsed += ATTRIBUTE_COST_PER_LEVEL[this.body];
-        totalUsed += ATTRIBUTE_COST_PER_LEVEL[this.mind];
-        totalUsed += ATTRIBUTE_COST_PER_LEVEL[this.soul];
-
-        return totalUsed;
     }
 }
 
@@ -160,7 +95,6 @@ export class Talent {
 
 export class CharacterSheet {
     name: string;
-    remaining_xp: number;
     total_xp: number;
     skills: SkillTable;
     attributes: Attributes;
@@ -172,11 +106,10 @@ export class CharacterSheet {
     has_shield: boolean;
     short_term_goal: string;
     long_term_goal: string;
-    talents: Map<string, Talent>;
+    talents: { [name: string]: Talent };
 
     constructor(name: string) {
         this.name = name;
-        this.remaining_xp = 35;
         this.total_xp = 35;
         this.skills = new SkillTable();
         this.attributes = new Attributes();
@@ -188,17 +121,23 @@ export class CharacterSheet {
         this.has_shield = false;
         this.short_term_goal = "";
         this.long_term_goal = "";
-        this.talents = new Map<string, Talent>();
+        this.talents = {};
     }
 
     public calculateUsedXp(): number {
         let totalUsed = 0;
 
-        totalUsed += this.attributes.getUsedXp();
-        totalUsed += this.skills.getUsedXp();
+        totalUsed += ATTRIBUTE_COST_PER_LEVEL[this.attributes.body];
+        totalUsed += ATTRIBUTE_COST_PER_LEVEL[this.attributes.mind];
+        totalUsed += ATTRIBUTE_COST_PER_LEVEL[this.attributes.soul];
 
-        for (const talent of this.talents) {
-            totalUsed += talent[1].cost;
+        for (const skillName in this.skills) {
+            totalUsed += SKILL_COST_PER_LEVEL[this.skills[skillName].training];
+            totalUsed += SKILL_COST_PER_LEVEL[this.skills[skillName].focus];
+        }
+
+        for (const talent in this.talents) {
+            totalUsed += this.talents[talent].cost;
         }
 
         return totalUsed;

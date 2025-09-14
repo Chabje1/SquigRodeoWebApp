@@ -80,26 +80,35 @@ function setActiveEditCharacter(charName: string) {
    selectedCharacterName = charName;
 
    document.querySelector<HTMLDivElement>("#edit_character_sheet")!.classList.remove("hidden");
+   document.querySelector<HTMLButtonElement>("#export_character")!.classList.remove("hidden");
 
    let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
 
    document.querySelector<HTMLInputElement>("#character_name_input")!.value = charName;
 
+   // XP
    updateRemainingXp();
    document.querySelector<HTMLInputElement>("#total_xp_input")!.valueAsNumber = selectedCharacter.total_xp;
 
+   // Skills
    for (const skillName in selectedCharacter.skills) {
-      if (selectedCharacter.skills[skillName] instanceof Skill) {
-         displaySkillValue("training", skillName, (selectedCharacter.skills[skillName] as Skill).training);
-         displaySkillValue("focus", skillName, (selectedCharacter.skills[skillName] as Skill).focus);
-      }
+      displaySkillValue("training", skillName, (selectedCharacter.skills[skillName] as Skill).training);
+      displaySkillValue("focus", skillName, (selectedCharacter.skills[skillName] as Skill).focus);
    }
 
+   // Attributes
+   document.querySelector<HTMLInputElement>("#body_input_field")!.value = selectedCharacter.attributes.body.toString();
+   document.querySelector<HTMLInputElement>("#mind_input_field")!.value = selectedCharacter.attributes.mind.toString();
+   document.querySelector<HTMLInputElement>("#soul_input_field")!.value = selectedCharacter.attributes.soul.toString();
+
+   // Aqua Ghyranis
    document.querySelector<HTMLInputElement>("#aqua_hyranis_editor")!.value = selectedCharacter.aqua_ghyranis.toString();
 
+   // Goals
    document.querySelector<HTMLTextAreaElement>("#character_editor_stg_input")!.value = selectedCharacter.short_term_goal;
    document.querySelector<HTMLTextAreaElement>("#character_editor_ltg_input")!.value = selectedCharacter.long_term_goal;
 
+   // Talents
    document.querySelector<HTMLDivElement>("#talent_editor_panel")!.classList.add("hidden");
    selectedTalentName = ""
 
@@ -109,10 +118,10 @@ function setActiveEditCharacter(charName: string) {
       talent_list.removeChild(talent_list.lastChild);
    }
 
-   for (const talent of selectedCharacter.talents) {
+   for (const talent in selectedCharacter.talents) {
       let newOption: HTMLOptionElement = document.createElement("option");
-      newOption.value = talent[1].name;
-      newOption.innerText = talent[1].name;
+      newOption.value = selectedCharacter.talents[talent].name;
+      newOption.innerText = selectedCharacter.talents[talent].name;
       talent_list.appendChild(newOption);
    }
 
@@ -123,18 +132,8 @@ function onCharacterSelected(this: HTMLSelectElement) {
    setActiveEditCharacter(this.value);
 }
 
-function createCharacter() {
+function handleNewCharacter(name: string) {
    let newOption: HTMLOptionElement = document.createElement("option");
-
-   let name = prompt("Character Name")!;
-
-   while (globalCharacterDictionary.has(name)) {
-      alert("Error: Character already exists.");
-      name = prompt("Character Name")!;
-   }
-
-   // Character List Update
-   globalCharacterDictionary.set(name, new CharacterSheet(name));
 
    // Character Dropdown
    newOption.value = name;
@@ -147,6 +146,21 @@ function createCharacter() {
 
    // Activate Character
    setActiveEditCharacter(name);
+}
+
+function createCharacterButtonClick() {
+
+   let name = prompt("Character Name")!;
+
+   while (globalCharacterDictionary.has(name)) {
+      alert("Error: Character already exists.");
+      name = prompt("Character Name")!;
+   }
+
+   // Character List Update
+   globalCharacterDictionary.set(name, new CharacterSheet(name));
+
+   handleNewCharacter(name);
 }
 
 function deleteCharacter() {
@@ -170,11 +184,12 @@ function deleteCharacter() {
       selectedCharacterName = "";
       character_list.value = "";
       document.querySelector<HTMLDivElement>("#edit_character_sheet")!.classList.add("hidden");
+      document.querySelector<HTMLButtonElement>("#export_character")!.classList.add("hidden");
    }
 }
 
 document.querySelector<HTMLSelectElement>("#character_list_dropdown")!.addEventListener("change", onCharacterSelected)
-document.querySelector<HTMLButtonElement>("#add_character")!.addEventListener("click", createCharacter)
+document.querySelector<HTMLButtonElement>("#add_character")!.addEventListener("click", createCharacterButtonClick)
 document.querySelector<HTMLButtonElement>("#remove_character")!.addEventListener("click", deleteCharacter)
 
 function updateRemainingXp() {
@@ -335,7 +350,6 @@ document.querySelector<HTMLInputElement>("#character_name_input")!.addEventListe
 function setAttributeValue(name: string, value: number) {
    let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
 
-   console.log(selectedCharacter.attributes)
    selectedCharacter.attributes[name] = value;
 
    updateRemainingXp();
@@ -389,7 +403,7 @@ function setActiveEditTalent(name: string) {
    let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
    selectedTalentName = name;
 
-   let selectedTalent = selectedCharacter.talents.get(selectedTalentName)!;
+   let selectedTalent = selectedCharacter.talents[selectedTalentName];
 
    document.querySelector<HTMLDivElement>("#talent_editor_panel")!.classList.remove("hidden");
 
@@ -409,13 +423,13 @@ function addTalent() {
 
    let name = prompt("Talent Name")!;
 
-   while (selectedCharacter.talents.has(name)) {
+   while (selectedCharacter.talents[name]) {
       alert("Error: Talent already exists.");
       name = prompt("Talent Name")!;
    }
 
    // Character List Update
-   selectedCharacter.talents.set(name, new Talent(name));
+   selectedCharacter.talents[name] = new Talent(name);
 
    // Character Dropdown
    newOption.value = name;
@@ -434,7 +448,7 @@ function addTalent() {
 
 function removeTalent() {
    let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
-   selectedCharacter.talents.delete(selectedTalentName);
+   delete selectedCharacter.talents[selectedTalentName];
 
    let talent_list = document.querySelector<HTMLSelectElement>("#editor_talent_list_dropdown")!;
 
@@ -467,16 +481,16 @@ document.querySelector<HTMLButtonElement>("#remove_talent")!.addEventListener("c
 function setTalentName(this: HTMLInputElement): boolean {
    let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
 
-   if (selectedCharacter.talents.get(this.value) !== undefined) {
+   if (selectedCharacter.talents[this.value] !== undefined) {
       alert("Error: Talent already exists.");
       return false;
    }
-   let selectedTalent = selectedCharacter.talents.get(selectedTalentName)!;
+   let selectedTalent = selectedCharacter.talents[selectedTalentName];
 
    selectedTalent.name = this.value;
 
-   selectedCharacter.talents.delete(selectedTalentName);
-   selectedCharacter.talents.set(selectedTalent.name, selectedTalent);
+   delete selectedCharacter.talents[selectedTalentName];
+   selectedCharacter.talents[selectedTalent.name] = selectedTalent;
 
    let talent_list = document.querySelector<HTMLSelectElement>("#editor_talent_list_dropdown")!;
 
@@ -496,20 +510,56 @@ function setTalentName(this: HTMLInputElement): boolean {
 
 function setTalentCost(this: HTMLInputElement) {
    let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
-   let selectedTalent = selectedCharacter.talents.get(selectedTalentName)!;
 
-   selectedTalent.cost = +this.value;
+   selectedCharacter.talents[selectedTalentName].cost = +this.value;
 
    updateRemainingXp();
 }
 
 function setTalentDescription(this: HTMLTextAreaElement) {
    let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
-   let selectedTalent = selectedCharacter.talents.get(selectedTalentName)!;
 
-   selectedTalent.description = this.value;
+   selectedCharacter.talents[selectedTalentName].description = this.value;
 }
 
 document.querySelector<HTMLInputElement>("#editor_talent_name")!.addEventListener("input", setTalentName)
 document.querySelector<HTMLInputElement>("#editor_talent_cost")!.addEventListener("input", setTalentCost)
 document.querySelector<HTMLTextAreaElement>("#editor_talent_description")!.addEventListener("input", setTalentDescription)
+
+// Export/Import Character
+function exportCharacter() {
+   let jsonString = JSON.stringify(globalCharacterDictionary.get(selectedCharacterName)!);
+
+   var a = document.createElement("a");
+   var file = new Blob([jsonString], { type: "application/json" });
+   a.href = URL.createObjectURL(file);
+   a.download = selectedCharacterName + ".json";
+   a.click();
+   URL.revokeObjectURL(a.href);
+}
+
+async function importCharacter(this: HTMLInputElement) {
+   if (this.files && this.files.length === 1) {
+      let textPromise = await this.files[0].text();
+
+      let fileObject = JSON.parse(textPromise);
+      let importedCharacter = new CharacterSheet(fileObject.name);
+
+      importedCharacter = Object.assign(importedCharacter, fileObject);
+
+      globalCharacterDictionary.set(importedCharacter.name, importedCharacter);
+
+      handleNewCharacter(importedCharacter.name);
+   }
+}
+
+function importCharacterClick() {
+   const elem = document.createElement("input");
+   elem.type = "file";
+   elem.accept = "json";
+   elem.addEventListener("change", importCharacter);
+   elem.click();
+}
+
+document.querySelector<HTMLButtonElement>("#export_character")!.addEventListener("click", exportCharacter);
+document.querySelector<HTMLButtonElement>("#import_character")!.addEventListener("click", importCharacterClick);
