@@ -81,6 +81,7 @@ function setActiveEditCharacter(charName: string) {
 
    document.querySelector<HTMLDivElement>("#edit_character_sheet")!.classList.remove("hidden");
    document.querySelector<HTMLButtonElement>("#export_character")!.classList.remove("hidden");
+   document.querySelector<HTMLButtonElement>("#play_character")!.classList.remove("hidden");
 
    let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
 
@@ -185,6 +186,7 @@ function deleteCharacter() {
       character_list.value = "";
       document.querySelector<HTMLDivElement>("#edit_character_sheet")!.classList.add("hidden");
       document.querySelector<HTMLButtonElement>("#export_character")!.classList.add("hidden");
+      document.querySelector<HTMLButtonElement>("#play_character")!.classList.add("hidden");
    }
 }
 

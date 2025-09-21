@@ -13,104 +13,108 @@
 
   <div class="flex flex-col h-screen bg-[#b0b0b0]">
     <div id="home_button" title="Click here to return home"
-      class="hover:border-white grid rounded-lg h-10 w-full border-black border-1 bg-[#305bab] font-bold place-items-center text-white">
+      class="hover:border-white grid rounded-lg h-[4vh] w-full border-black border-1 bg-[#305bab] font-bold place-items-center text-white text-[1.6vh]">
       SOULBOUND COMPANION
     </div>
-    <div id="home_screen" class="grid grid-rows-[1fr_1fr_40px] w-full h-full gap-2 mb-2">
-      <div class="mr-2 ml-2 mt-2 flex flex-1 gap-2">
+    <div id="home_screen" class="grid grid-rows-[1fr_1fr_4vh] w-full h-[96vh] gap-[0.8vh] mb-2">
+      <div class="mr-2 ml-2 mt-2 flex flex-1 gap-2 h-full">
         <!-- LEFT TOP -->
-        <div class="grid grid-cols-1 grid-rows-[40px_40px_40px_1fr] w-1/2 gap-2 h-full">
+        <div class="grid grid-cols-1 grid-rows-[4vh_4vh_4vh_1fr] w-1/2 gap-2 h-full">
           <button id="characters_button"
-            class="hover:border-white border-black border-1 bg-[#305bab] text-white font-bold h-10 rounded-lg w-9/10 justify-center">Characters
+            class="hover:border-white border-black border-1 bg-[#305bab] text-white font-bold h-[4vh] rounded-lg w-9/10 justify-center text-[1.6vh]">Characters
             List</button>
           <button id="bestiary_button"
-            class="hover:border-white border-black border-1 bg-[#305bab] text-white font-bold h-10 rounded-lg w-9/10 justify-center">Bestiary</button>
+            class="hover:border-white border-black border-1 bg-[#305bab] text-white font-bold h-[4vh] rounded-lg w-9/10 justify-center text-[1.6vh]">Bestiary</button>
           <button
-            class="hover:border-white border-black border-1 bg-[#305bab] text-white font-bold h-10 rounded-lg w-9/10 justify-center">Battle
+            class="hover:border-white border-black border-1 bg-[#305bab] text-white font-bold h-[4vh] rounded-lg w-9/10 justify-center text-[1.6vh]">Battle
             Mode</button>
-          <div id="chatWindow" class="border-black overflow-y-auto border-1 rounded-lg bg-[#c6dcff] w-9/10 h-full">
+          <div id="chatWindow" class="border-black overflow-y-auto border-1 rounded-lg bg-[#c6dcff] w-9/10 h-[29vh]">
           </div>
         </div>
         <!-- RIGHT TOP -->
         <div class="w-1/2 flex flex-col">
           <div class="flex gap-1"> <!-- SOULFIRE START -->
-            <div class="w-1/3 h-10 items-center">
-              <div class="flex flex-1 items-center justify-end h-10">Soulfire:</div>
+            <div class="w-1/3 h-[4vh] items-center">
+              <div class="flex flex-1 items-center justify-end h-[4vh] text-[1.6vh]">Soulfire:</div>
             </div>
-            <div class="flex gap-1 w-2/3 h-10 items-center ">
-              <div id="unused_soulfire_holder" class="flex flex-none w-min items-center h-10 gap-1">
+            <div class="flex gap-1 w-2/3 h-[4vh] items-center ">
+              <div id="unused_soulfire_holder" class="flex flex-none w-min items-center h-[4vh] gap-1">
                 <div class="flex flex-none bg-gray-500 size-5"></div>
                 <div class="flex flex-none bg-gray-500 size-5"></div>
                 <div class="flex flex-none bg-gray-500 size-5"></div>
               </div>
-              <div id="used_soulfire_holder" class="flex flex-1 items-center h-10 gap-1">
+              <div id="used_soulfire_holder" class="flex flex-1 items-center h-[4vh] gap-1">
                 <div class="flex flex-none bg-gray-300 size-5"></div>
               </div>
             </div>
           </div> <!-- SOULFIRE END -->
           <div class="flex gap-1"> <!-- DOOM START -->
-            <div class="w-1/3 h-10 items-center">
-              <div class="flex flex-1 items-center justify-end h-10">Doom:</div>
+            <div class="w-1/3 h-[4vh] items-center">
+              <div class="flex flex-1 items-center justify-end h-[4vh] text-[1.6vh]">Doom:</div>
             </div>
-            <div class="flex gap-1 w-2/3 h-10 items-center">
-              <div id="unused_doom_holder" class="flex flex-none w-min items-center h-10 gap-1">
+            <div class="flex gap-1 w-2/3 h-[4vh] items-center">
+              <div id="unused_doom_holder" class="flex flex-none w-min items-center h-[4vh] gap-1">
                 <div class="flex flex-none bg-gray-500 size-5"></div>
                 <div class="flex flex-none bg-gray-500 size-5"></div>
                 <div class="flex flex-none bg-gray-500 size-5"></div>
               </div>
-              <div id="used_doom_holder" class="flex flex-1 items-center h-10 gap-1">
+              <div id="used_doom_holder" class="flex flex-1 items-center h-[4vh] gap-1">
                 <div class="flex flex-none bg-gray-300 size-5"></div>
               </div>
             </div>
           </div> <!-- DOOM END -->
-          <div class="flex flex-initial h-full rounded-lg bg-amber-300"> <!-- PARTY SHEET START -->
+          <div class="flex flex-initial h-[35vh] rounded-lg bg-amber-300"> <!-- PARTY SHEET START -->
             Party Sheet
           </div> <!-- PARTY SHEET END -->
         </div>
       </div>
-      <div class="mr-2 ml-2 flex flex-1 rounded-lg bg-red-500">
+      <div class="mr-2 ml-2 flex flex-1 rounded-lg bg-red-500 h-[44vh]">
         Character Sheet Preview
       </div>
       <div class="mr-2 ml-2 grid grid-cols-3">
         <div class="grid grid-cols-2 gap-2">
-          <div class="flex flex-1 text-xl items-center justify-end font-bold">
+          <div class="flex flex-1 text-[2vh] items-center justify-end font-bold">
             Dice
           </div>
           <div>
-            <div class="grid grid-cols-3 bg-[#c6dcff] h-full w-20 rounded-lg border-black border-1">
+            <div class="grid grid-cols-3 bg-[#c6dcff] h-[4vh] w-20 rounded-lg border-black border-1">
               <button id="numDiceDecreaseButton"
-                class="hover:text-white border-black border-r-1 text-xl font-bold">-</button>
-              <div id="numDiceView" class="flex flex-1 text-xl items-center justify-center font-bold">0</div>
+                class="hover:text-white border-black border-r-1 text-[2vh] font-bold">-</button>
+              <div id="numDiceView" class="flex flex-1 text-[2vh] items-center justify-center font-bold">0</div>
               <button id="numDiceIncreaseButton"
-                class="hover:text-white border-black border-l-1 text-xl font-bold">+</button>
+                class="hover:text-white border-black border-l-1 text-[2vh] font-bold">+</button>
             </div>
           </div>
         </div>
         <div class=" grid grid-rows-1 w-full h-full place-content-center">
           <button id="rollDiceButton"
-            class="hover:border-white bg-[#305bab] text-white font-bold text-xl h-full w-40 rounded-lg border-black border-1">ROLL</button>
+            class="hover:border-white bg-[#305bab] text-white font-bold text-[2vh] h-full w-40 rounded-lg border-black border-1">ROLL</button>
         </div>
         <div class="grid grid-cols-2 gap-2">
-          <div class="flex flex-1 text-xl items-center justify-end font-bold">
+          <div class="flex flex-1 text-[2vh] items-center justify-end font-bold">
             DN
           </div>
           <input id="diffNumHolder" type="number" min="0" max="6" value="0"
-            class="rounded-lg bg-[#c6dcff] border-black border-1 h-full text-center w-10 text-xl font-bold"></input>
+            class="rounded-lg bg-[#c6dcff] border-black border-1 h-full text-center w-10 text-[2vh] font-bold"></input>
         </div>
       </div>
     </div>
-    <div id="character_screen" class="grid grid-rows-[40px_1fr] w-full h-full gap-2 hidden">
+    <div id="character_screen" class="grid grid-rows-[40px_1fr] w-full h-[96vh] overflow-y-auto  gap-2 hidden">
       <div class="mt-2 mr-2 ml-2 flex flex-1 items-center justify-center gap-2">
+        <button id="play_character" title="Play Character" class="hidden rounded-lg hover:bg-[#d0d0d0]"><i
+            class="material-symbols-rounded">person_play</i></button>
         <select id="character_list_dropdown"
           class="font-bold indent-1 w-1/5 bg-[#c6dcff] border-black border-1 rounded-lg">
         </select>
-        <button id="add_character" class="rounded-lg hover:bg-[#d0d0d0]"><i
+        <button id="add_character" title="Create New Character" class="rounded-lg hover:bg-[#d0d0d0]"><i
             class="material-symbols-rounded">add</i></button>
-        <button id="remove_character" class="rounded-lg hover:bg-[#d0d0d0]"><i
+        <button id="remove_character" title="Delete Character" class="rounded-lg hover:bg-[#d0d0d0]"><i
             class="material-symbols-rounded">remove</i></button>
-        <button id="import_character" class="rounded-lg hover:bg-[#d0d0d0]"><i class="material-symbols-rounded">
+        <button id="import_character" title="Import Character" class="rounded-lg hover:bg-[#d0d0d0]"><i
+            class="material-symbols-rounded">
             file_upload</i></button>
-        <button id="export_character" class="hidden rounded-lg hover:bg-[#d0d0d0]"><i class="material-symbols-rounded">
+        <button id="export_character" title="Export Character" class="hidden rounded-lg hover:bg-[#d0d0d0]"><i
+            class="material-symbols-rounded">
             file_download</i></button>
       </div>
       <div id="edit_character_sheet"
@@ -196,7 +200,7 @@
         </div>
       </div>
     </div>
-    <div id="bestiary_screen" class="h-full w-full hidden">
+    <div id="bestiary_screen" class="h-[96vh]  w-full hidden">
 
     </div>
   </div>
