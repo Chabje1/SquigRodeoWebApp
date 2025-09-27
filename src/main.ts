@@ -24,8 +24,6 @@ document.querySelector<HTMLButtonElement>("#home_button")!.addEventListener("cli
 document.querySelector<HTMLButtonElement>("#characters_button")!.addEventListener("click", charactersButtonClick)
 document.querySelector<HTMLButtonElement>("#bestiary_button")!.addEventListener("click", bestiaryButtonClick)
 
-charactersButtonClick()
-
 // Dice Button Logic
 let numDice: number = 0;
 let currentUserName: string = "Stellia";
