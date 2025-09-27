@@ -722,3 +722,39 @@ function importCharacterClick() {
 
 document.querySelector<HTMLButtonElement>("#export_character")!.addEventListener("click", exportCharacter);
 document.querySelector<HTMLButtonElement>("#import_character")!.addEventListener("click", importCharacterClick);
+
+// Talent Tab Button
+function talentTabClick() {
+   document.querySelector<HTMLDivElement>('#talent_editor_window')!.classList.remove("hidden");
+   document.querySelector<HTMLDivElement>('#character_editor_stg_input')!.classList.add("hidden");
+   document.querySelector<HTMLDivElement>('#character_editor_ltg_input')!.classList.add("hidden");
+
+   document.querySelector<HTMLDivElement>('#talent_tab_button')!.classList.add("bg-[#c6dcff]", "border-1", "border-black");
+   document.querySelector<HTMLDivElement>('#stg_tab_button')!.classList.remove("bg-[#c6dcff]", "border-1", "border-black");
+   document.querySelector<HTMLDivElement>('#ltg_tab_button')!.classList.remove("bg-[#c6dcff]", "border-1", "border-black");
+}
+document.querySelector<HTMLButtonElement>("#talent_tab_button")!.addEventListener("click", talentTabClick);
+
+// STG Tab Button
+function stgTabClick() {
+   document.querySelector<HTMLDivElement>('#talent_editor_window')!.classList.add("hidden");
+   document.querySelector<HTMLDivElement>('#character_editor_stg_input')!.classList.remove("hidden");
+   document.querySelector<HTMLDivElement>('#character_editor_ltg_input')!.classList.add("hidden");
+
+   document.querySelector<HTMLDivElement>('#talent_tab_button')!.classList.remove("bg-[#c6dcff]", "border-1", "border-black");
+   document.querySelector<HTMLDivElement>('#stg_tab_button')!.classList.add("bg-[#c6dcff]", "border-1", "border-black");
+   document.querySelector<HTMLDivElement>('#ltg_tab_button')!.classList.remove("bg-[#c6dcff]", "border-1", "border-black");
+}
+document.querySelector<HTMLButtonElement>("#stg_tab_button")!.addEventListener("click", stgTabClick);
+
+// LTG Tab Button
+function ltgTabClick() {
+   document.querySelector<HTMLDivElement>('#talent_editor_window')!.classList.add("hidden");
+   document.querySelector<HTMLDivElement>('#character_editor_stg_input')!.classList.add("hidden");
+   document.querySelector<HTMLDivElement>('#character_editor_ltg_input')!.classList.remove("hidden");
+
+   document.querySelector<HTMLDivElement>('#talent_tab_button')!.classList.remove("bg-[#c6dcff]", "border-1", "border-black");
+   document.querySelector<HTMLDivElement>('#stg_tab_button')!.classList.remove("bg-[#c6dcff]", "border-1", "border-black");
+   document.querySelector<HTMLDivElement>('#ltg_tab_button')!.classList.add("bg-[#c6dcff]", "border-1", "border-black");
+}
+document.querySelector<HTMLButtonElement>("#ltg_tab_button")!.addEventListener("click", ltgTabClick);

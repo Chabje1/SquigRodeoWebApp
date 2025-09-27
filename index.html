@@ -261,40 +261,44 @@
               </div>
             </div>
 
-            <div class="flex flex-col w-full h-full">
-              <div class="font-bold text-center">Talents</div>
-              <div class="w-full h-10 grid grid-cols-12 place-items-center">
-                <select id="editor_talent_list_dropdown"
-                  class="font-bold indent-1 col-start-5 col-span-4 w-full bg-[#c6dcff] border-black border-1 rounded-lg">
-                </select>
-                <button id="add_talent" class="rounded-lg hover:bg-[#d0d0d0]"><i
-                    class="material-symbols-rounded">add</i></button>
-                <button id="remove_talent" class="rounded-lg hover:bg-[#d0d0d0]"><i
-                    class="material-symbols-rounded">remove</i></button>
-              </div>
-              <div class="w-full border-1 border-black rounded-lg h-full flex">
-                <div id="talent_editor_panel" class="grid grid-cols-4 grid-rows-[10px_30px_30px_1fr]">
-                  <div class="grid row-start-2 font-bold place-items-center">Talent Name</div>
-                  <input id="editor_talent_name"
-                    class="row-start-2 bg-[#c6dcff] rounded-lg border-1 border-black indent-1"></input>
-                  <div class="flex row-start-2 m-2 font-bold justify-end items-center">Cost</div>
-                  <input id="editor_talent_cost"
-                    class="row-start-2 bg-[#c6dcff] w-1/2 rounded-lg border-1 border-black indent-1"></input>
-                  <div class="flex row-start-3 mt-2 font-bold justify-end items-center">Description</div>
-                  <textarea id="editor_talent_description"
-                    class="resize-none indent-1 col-span-4 bg-[#c6dcff] row-start-4 mb-2 mr-2 ml-2 rounded-lg border-1 border-black"></textarea>
+            <div class="flex flex-col h-full">
+              <div class="grid grid-cols-3">
+                <div id="talent_tab_button" class="font-bold text-center bg-[#c6dcff] border-1 border-black">Talents
                 </div>
+                <div id="stg_tab_button" class="font-bold text-center">Short-Term Goal</div>
+                <div id="ltg_tab_button" class="font-bold text-center">Long-Term Goal</div>
               </div>
-            </div>
-            <div class="flex flex-col w-full h-full">
-              <div class="font-bold text-center">Short-Term Goal</div>
-              <textarea id="character_editor_stg_input"
-                class="resize-none w-full bg-[#c6dcff] h-full rounded-lg border-1 border-black"></textarea>
-            </div>
-            <div class="flex flex-col w-full h-full">
-              <div class="font-bold text-center">Long-Term Goal</div>
-              <textarea id="character_editor_ltg_input"
-                class="resize-none w-full bg-[#c6dcff] h-full rounded-lg border-1 border-black"></textarea>
+
+              <div class="border-1 border-black h-full">
+                <div id="talent_editor_window" class="flex flex-col w-full h-full">
+                  <div class="w-full h-10 grid grid-cols-12 place-items-center">
+                    <select id="editor_talent_list_dropdown"
+                      class="font-bold indent-1 col-start-5 col-span-4 w-full bg-[#c6dcff] border-black border-1 rounded-lg">
+                    </select>
+                    <button id="add_talent" class="rounded-lg hover:bg-[#d0d0d0]"><i
+                        class="material-symbols-rounded">add</i></button>
+                    <button id="remove_talent" class="rounded-lg hover:bg-[#d0d0d0]"><i
+                        class="material-symbols-rounded">remove</i></button>
+                  </div>
+                  <div class="w-full h-full flex">
+                    <div id="talent_editor_panel" class="grid grid-cols-4 grid-rows-[10px_30px_30px_30px_1fr]">
+                      <div class="grid row-start-2 text-sm font-bold place-items-center">Talent Name</div>
+                      <input id="editor_talent_name"
+                        class="row-start-2 bg-[#c6dcff] text-sm col-span-2  rounded-lg border-1 border-black indent-1"></input>
+                      <div class="grid row-start-3 text-sm font-bold place-items-center">Cost</div>
+                      <input id="editor_talent_cost"
+                        class="row-start-3 bg-[#c6dcff] text-sm  w-1/2 rounded-lg border-1 border-black indent-1"></input>
+                      <div class="flex row-start-4 mt-2 font-bold justify-end items-center">Description</div>
+                      <textarea id="editor_talent_description"
+                        class="resize-none indent-1 col-span-4 bg-[#c6dcff] row-start-5 mb-2 mr-2 ml-2 rounded-lg border-1 border-black"></textarea>
+                    </div>
+                  </div>
+                </div>
+                <textarea id="character_editor_stg_input"
+                  class="hidden resize-none w-full bg-[#c6dcff] h-full"></textarea>
+                <textarea id="character_editor_ltg_input"
+                  class="hidden resize-none w-full bg-[#c6dcff] h-full"></textarea>
+              </div>
             </div>
           </div>
         </div>
