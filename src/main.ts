@@ -24,6 +24,8 @@ document.querySelector<HTMLButtonElement>("#home_button")!.addEventListener("cli
 document.querySelector<HTMLButtonElement>("#characters_button")!.addEventListener("click", charactersButtonClick)
 document.querySelector<HTMLButtonElement>("#bestiary_button")!.addEventListener("click", bestiaryButtonClick)
 
+charactersButtonClick()
+
 // Dice Button Logic
 let numDice: number = 0;
 let currentUserName: string = "Stellia";
@@ -104,6 +106,28 @@ function setActiveEditCharacter(charName: string) {
 
    // Aqua Ghyranis
    document.querySelector<HTMLInputElement>("#aqua_hyranis_editor")!.value = selectedCharacter.aqua_ghyranis.toString();
+
+   // Implicit Stats
+   updateTotalToughness();
+   updateTotalMettle();
+   updateTotalWounds();
+   updateCharacterInitiative();
+   updateCharacterNaturalAwareness();
+
+   // Combat Stats
+   updateCharacterMelee();
+   updateCharacterAccuracy();
+   updateCharacterDefence();
+
+   // Remainings
+   document.querySelector<HTMLInputElement>("#remaining_mettle_input")!.value = selectedCharacter.remaining_mettle.toString();
+   document.querySelector<HTMLInputElement>("#remaining_toughness_input")!.value = selectedCharacter.remaining_toughness.toString();
+   document.querySelector<HTMLInputElement>("#remaining_wounds_input")!.value = selectedCharacter.remaining_wounds.toString();
+
+   // Armour & Shield
+   document.querySelector<HTMLInputElement>("#armour_input")!.value = selectedCharacter.armour.toString();
+
+   document.querySelector<HTMLInputElement>("#has_shield_toggle")!.checked = (selectedCharacter.shield_bonus == 1);
 
    // Goals
    document.querySelector<HTMLTextAreaElement>("#character_editor_stg_input")!.value = selectedCharacter.short_term_goal;
@@ -194,6 +218,66 @@ document.querySelector<HTMLSelectElement>("#character_list_dropdown")!.addEventL
 document.querySelector<HTMLButtonElement>("#add_character")!.addEventListener("click", createCharacterButtonClick)
 document.querySelector<HTMLButtonElement>("#remove_character")!.addEventListener("click", deleteCharacter)
 
+function updateTotalToughness() {
+   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+
+   document.querySelector<HTMLDivElement>("#editor_total_toughness_display")!.innerText = selectedCharacter.getTotalToughness().toString();
+}
+
+function updateTotalMettle() {
+   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+
+   document.querySelector<HTMLDivElement>("#editor_total_mettle_display")!.innerText = selectedCharacter.getTotalMettle().toString();
+}
+
+function updateTotalWounds() {
+   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+
+   document.querySelector<HTMLDivElement>("#editor_total_wounds_display")!.innerText = selectedCharacter.getTotalWounds().toString();
+}
+
+function updateCharacterInitiative() {
+   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+
+   document.querySelector<HTMLDivElement>("#initiative_display")!.innerText = selectedCharacter.getInitiative().toString();
+}
+
+function updateCharacterNaturalAwareness() {
+   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+
+   document.querySelector<HTMLDivElement>("#natural_awareness_display")!.innerText = selectedCharacter.getNaturalAwareness().toString();
+}
+
+function updateCharacterMelee() {
+   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+
+   for (let index = 0; index < 6; index++) {
+      document.querySelector<HTMLDivElement>("#melee_" + index.toString())!.classList.remove("bg-gray-500");
+   }
+
+   document.querySelector<HTMLDivElement>("#melee_" + selectedCharacter.getMelee().toString())!.classList.add("bg-gray-500");
+}
+
+function updateCharacterAccuracy() {
+   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+
+   for (let index = 0; index < 6; index++) {
+      document.querySelector<HTMLDivElement>("#accuracy_" + index.toString())!.classList.remove("bg-gray-500");
+   }
+
+   document.querySelector<HTMLDivElement>("#accuracy_" + selectedCharacter.getAccuracy().toString())!.classList.add("bg-gray-500");
+}
+
+function updateCharacterDefence() {
+   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+
+   for (let index = 0; index < 6; index++) {
+      document.querySelector<HTMLDivElement>("#defence_" + index.toString())!.classList.remove("bg-gray-500");
+   }
+
+   document.querySelector<HTMLDivElement>("#defence_" + selectedCharacter.getDefence().toString())!.classList.add("bg-gray-500");
+}
+
 function updateRemainingXp() {
    let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
 
@@ -240,6 +324,13 @@ function setCharacterSkillTraining(name: string, level: number) {
    displaySkillValue("training", name, level);
 
    updateRemainingXp();
+
+   updateCharacterInitiative();
+   updateCharacterNaturalAwareness();
+
+   updateCharacterMelee();
+   updateCharacterDefence();
+   updateCharacterAccuracy();
 }
 
 function setCharacterSkillFocus(name: string, level: number) {
@@ -359,14 +450,31 @@ function setAttributeValue(name: string, value: number) {
 
 function setBodyValue(this: HTMLInputElement) {
    setAttributeValue("body", +this.value);
+
+   updateTotalToughness();
+   updateTotalWounds();
+
+   updateCharacterMelee();
+   updateCharacterDefence();
 }
 
 function setMindValue(this: HTMLInputElement) {
    setAttributeValue("mind", +this.value);
+
+   updateTotalToughness();
+   updateTotalWounds();
+   updateCharacterInitiative();
+   updateCharacterNaturalAwareness();
+
+   updateCharacterAccuracy();
 }
 
 function setSoulValue(this: HTMLInputElement) {
    setAttributeValue("soul", +this.value);
+
+   updateTotalToughness();
+   updateTotalMettle();
+   updateTotalWounds();
 }
 
 document.querySelector<HTMLInputElement>("#body_input_field")!.addEventListener("input", setBodyValue)
@@ -381,6 +489,55 @@ function setAquaGhyranis(this: HTMLInputElement) {
 }
 
 document.querySelector<HTMLInputElement>("#aqua_hyranis_editor")!.addEventListener("input", setAquaGhyranis)
+
+// Armour
+function setCharacterArmour(this: HTMLInputElement) {
+   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+
+   selectedCharacter.armour = +this.value;
+}
+
+document.querySelector<HTMLInputElement>("#armour_input")!.addEventListener("input", setCharacterArmour)
+
+// Shield
+function setCharacterShield(this: HTMLInputElement) {
+   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+
+   if (this.checked)
+      selectedCharacter.shield_bonus = 1;
+   else
+      selectedCharacter.shield_bonus = 0;
+
+   updateCharacterDefence();
+}
+
+document.querySelector<HTMLInputElement>("#has_shield_toggle")!.addEventListener("input", setCharacterShield)
+
+// Remaining Mettle
+function setCharacterRemainingMettle(this: HTMLInputElement) {
+   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+
+   selectedCharacter.remaining_mettle = +this.value;
+}
+
+document.querySelector<HTMLInputElement>("#remaining_mettle_input")!.addEventListener("input", setCharacterRemainingMettle)
+
+// Remaining Toughness
+function setCharacterRemainingToughness(this: HTMLInputElement) {
+   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+
+   selectedCharacter.remaining_toughness = +this.value;
+}
+document.querySelector<HTMLInputElement>("#remaining_toughness_input")!.addEventListener("input", setCharacterRemainingToughness)
+
+// Remaining Wounds
+function setCharacterRemainingWounds(this: HTMLInputElement) {
+   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+
+   selectedCharacter.remaining_wounds = +this.value;
+}
+document.querySelector<HTMLInputElement>("#remaining_wounds_input")!.addEventListener("input", setCharacterRemainingWounds)
+
 
 // Long/Short Term Goals
 function setShortTermGoal(this: HTMLTextAreaElement) {

@@ -103,7 +103,7 @@ export class CharacterSheet {
     armour: number;
     remaining_toughness: number;
     remaining_wounds: number;
-    has_shield: boolean;
+    shield_bonus: number;
     short_term_goal: string;
     long_term_goal: string;
     talents: { [name: string]: Talent };
@@ -118,7 +118,7 @@ export class CharacterSheet {
         this.armour = 0;
         this.remaining_toughness = 0;
         this.remaining_wounds = 0;
-        this.has_shield = false;
+        this.shield_bonus = 0;
         this.short_term_goal = "";
         this.long_term_goal = "";
         this.talents = {};
@@ -141,5 +141,37 @@ export class CharacterSheet {
         }
 
         return totalUsed;
+    }
+
+    public getTotalToughness(): number {
+        return this.attributes.body + this.attributes.mind + this.attributes.soul;
+    }
+
+    public getTotalWounds(): number {
+        return Math.ceil((this.attributes.body + this.attributes.mind + this.attributes.soul) / 2);
+    }
+
+    public getTotalMettle(): number {
+        return Math.ceil(this.attributes.soul / 2);
+    }
+
+    public getInitiative(): number {
+        return this.attributes.mind + this.skills.reflexes.training + this.skills.awareness.training;
+    }
+
+    public getNaturalAwareness(): number {
+        return Math.ceil((this.attributes.mind + this.skills.awareness.training) / 2);
+    }
+
+    public getMelee(): number {
+        return Math.floor((this.attributes.body + this.skills.weapon_skill.training - 1) / 2);
+    }
+
+    public getAccuracy(): number {
+        return Math.floor((this.attributes.mind + this.skills.ballistic_skill.training - 1) / 2);
+    }
+
+    public getDefence(): number {
+        return Math.floor((this.attributes.body + this.skills.reflexes.training - 1) / 2) + this.shield_bonus;
     }
 }

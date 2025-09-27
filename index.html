@@ -117,8 +117,7 @@
             class="material-symbols-rounded">
             file_download</i></button>
       </div>
-      <div id="edit_character_sheet"
-        class="hidden grid grid-rows-[40px_40px_1fr] border-black rounded-lg border-1 gap-2 m-2">
+      <div id="edit_character_sheet" class="grid grid-rows-[40px_40px_1fr] border-black rounded-lg border-1 gap-2 m-2">
         <div class="flex indent-2 items-center font-bold gap-2">
           <label for="character_name_input">Character Name: </label>
           <input id="character_name_input" class="w-1/4 border-1 border-black indent-1"></input>
@@ -154,13 +153,114 @@
               <input id="soul_input_field"
                 class="font-bold text-center w-6 rounded-lg border-black border-1 bg-[#c6dcff]"></input>
             </div>
-            <div class="flex flex-row w-full h-10 justify-center gap-5">
-              <div class="flex font-bold items-center">
-                Aqua Ghyranis
+            <div class="grid grid-cols-2">
+              <div class="grid grid-rows-8 gap-1 justify-center">
+                <div class="font-bold text-sm text-center">
+                  Aqua Ghyranis
+                </div>
+                <div class="font-bold text-sm text-center">
+                  Initiative
+                </div>
+                <div class="font-bold text-sm text-center">
+                  Natural Awareness
+                </div>
+                <div class="font-bold text-sm text-center">
+                  Mettle
+                </div>
+                <div class="font-bold text-sm text-center">
+                  Armour
+                </div>
+                <div class="font-bold text-sm text-center">
+                  Toughness
+                </div>
+                <div class="font-bold text-sm text-center">
+                  Wounds
+                </div>
+                <div class="font-bold text-sm text-center">
+                  has Shield?
+                </div>
               </div>
-              <input id="aqua_hyranis_editor"
-                class="font-bold w-1/3 text-center bg-[#c6dcff] rounded-lg border-1 border-black"></input>
+              <div class="grid grid-rows-8 gap-1">
+                <input id="aqua_hyranis_editor" class="font-bold text-sm text-center border-1 border-black"></input>
+                <div id="initiative_display" class="font-bold text-sm text-center">
+                  0
+                </div>
+                <div id="natural_awareness_display" class="font-bold text-sm text-center">
+                  0
+                </div>
+                <div class="grid grid-cols-3">
+                  <input id="remaining_mettle_input"
+                    class="font-bold text-sm text-center border-1 border-black"></input>
+                  <div class="font-bold text-sm text-center">
+                    /
+                  </div>
+                  <div id="editor_total_mettle_display" class="font-bold text-sm text-center">
+                    0
+                  </div>
+                </div>
+                <input id="armour_input" class="font-bold text-sm text-center border-1 border-black"></input>
+
+                <div class="grid grid-cols-3">
+                  <input id="remaining_toughness_input"
+                    class="font-bold text-sm text-center border-1 border-black"></input>
+                  <div class="font-bold text-sm text-center">
+                    /
+                  </div>
+                  <div id="editor_total_toughness_display" class="font-bold text-sm text-center">
+                    0
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-3">
+                  <input id="remaining_wounds_input"
+                    class="font-bold text-sm text-center border-1 border-black"></input>
+                  <div class="font-bold text-sm text-center">
+                    /
+                  </div>
+                  <div id="editor_total_wounds_display" class="font-bold text-sm text-center">
+                    0
+                  </div>
+                </div>
+                <input type="checkbox" id="has_shield_toggle"></input>
+              </div>
             </div>
+
+            <div class="grid grid-cols-3 gap-1">
+              <div>
+                <div class="font-bold text-sm text-center">Melee</div>
+                <div class="flex flex-col border-1 border-black">
+                  <div id="melee_5" class="font-bold text-sm text-center">Extraordinary</div>
+                  <div id="melee_4" class="font-bold text-sm text-center">Superb</div>
+                  <div id="melee_3" class="font-bold text-sm text-center">Great</div>
+                  <div id="melee_2" class="font-bold text-sm text-center">Good</div>
+                  <div id="melee_1" class="font-bold text-sm text-center">Average</div>
+                  <div id="melee_0" class="font-bold text-sm text-center">Poor</div>
+                </div>
+              </div>
+              <div>
+                <div class="font-bold text-sm text-center">Accuracy</div>
+                <div class="flex flex-col border-1 border-black">
+                  <div id="accuracy_5" class="font-bold text-sm text-center">Extraordinary</div>
+                  <div id="accuracy_4" class="font-bold text-sm text-center">Superb</div>
+                  <div id="accuracy_3" class="font-bold text-sm text-center">Great</div>
+                  <div id="accuracy_2" class="font-bold text-sm text-center">Good</div>
+                  <div id="accuracy_1" class="font-bold text-sm text-center">Average</div>
+                  <div id="accuracy_0" class="font-bold text-sm text-center">Poor</div>
+                </div>
+              </div>
+              <div>
+                <div class="font-bold text-sm text-center">Defence</div>
+                <div class="flex flex-col border-1 border-black">
+                  <div id="defence_5" class="font-bold text-sm text-center">Extraordinary</div>
+                  <div id="defence_4" class="font-bold text-sm text-center">Superb</div>
+                  <div id="defence_3" class="font-bold text-sm text-center">Great</div>
+                  <div id="defence_2" class="font-bold text-sm text-center">Good</div>
+                  <div id="defence_1" class="font-bold text-sm text-center">Average</div>
+                  <div id="defence_0" class="font-bold text-sm text-center">Poor</div>
+                </div>
+              </div>
+            </div>
+
             <div class="flex flex-col w-full h-full">
               <div class="font-bold text-center">Talents</div>
               <div class="w-full h-10 grid grid-cols-12 place-items-center">
