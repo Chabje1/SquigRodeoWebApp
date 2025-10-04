@@ -1,6 +1,8 @@
 import { CharacterSheet, SkillTable, Skill, Talent } from "./CharacterSheet";
 import { toTitleCase } from "./utilities";
 
+import OBR from "@owlbear-rodeo/sdk";
+
 // Menu Navigation Button Logic
 function homeButtonClick() {
    document.querySelector<HTMLDivElement>('#home_screen')!.classList.remove("hidden");
@@ -72,6 +74,8 @@ function rollDiceAction() {
    }
 
    document.querySelector<HTMLDivElement>("#chatWindow")!.appendChild(message);
+
+   broadcastMessage(message.innerText);
 }
 
 document.querySelector<HTMLButtonElement>("#numDiceIncreaseButton")!.addEventListener("click", increaseDiceNum)
@@ -509,6 +513,8 @@ function rollSkillButtonClick() {
    }
 
    document.querySelector<HTMLDivElement>("#chatWindow")!.appendChild(message);
+
+   broadcastMessage(message.innerText);
 }
 
 document.querySelector<HTMLButtonElement>("#roll_skill_button")!.addEventListener("click", rollSkillButtonClick)
@@ -940,3 +946,29 @@ function changeActiveCharacterRemainingMettle(this: HTMLInputElement) {
 }
 
 document.querySelector<HTMLInputElement>('#current_character_remaining_mettle')!.addEventListener("input", changeActiveCharacterRemainingMettle);
+
+// ========================================================================================
+// OBR INTEGRATION
+// ========================================================================================
+function broadcastMessage(msg: string) {
+   if (OBR.isAvailable && OBR.isReady) {
+      OBR.broadcast.sendMessage("squigrodeo.chat_message", msg);
+   }
+}
+
+function receiveMessage(event: { data: unknown; connectionId: string; }) {
+
+   let message: HTMLParagraphElement = document.createElement("p")
+
+   message.innerText = event.data as string;
+
+   document.querySelector<HTMLDivElement>("#chatWindow")!.appendChild(message);
+
+   console.log(`Received The Following Message: ${event.data}`)
+}
+
+OBR.broadcast.onMessage("squigrodeo.chat_message", receiveMessage);
+
+if (OBR.isAvailable) {
+   console.log("HELLO OBR!");
+}
