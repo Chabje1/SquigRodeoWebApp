@@ -68,8 +68,87 @@
           </div> <!-- PARTY SHEET END -->
         </div>
       </div>
-      <div class="mr-2 ml-2 flex flex-1 rounded-lg bg-red-500 h-[44vh]">
-        Character Sheet Preview
+      <div class="mr-2 ml-2 border-2 border-black rounded-lg h-[44vh]"> <!-- Active Character Sheet -->
+        <div class="grid grid-cols-2 m-1">
+          <div class="flex flex-col">
+            <div id="current_character_name" class="ml-2 text-lg font-bold"> Stellia </div>
+            <div class="ml-2 flex flex-row gap-2"> <!-- Toughness -->
+              <div class="font-bold"> Toughness </div>
+              <input id="current_character_remaining_toughness" class="font-bold w-5 border-1 text-center"></input>
+              <div class="font-bold"> / </div>
+              <div id="current_character_total_toughness" class="font-bold"> 0 </div>
+            </div>
+            <div class="ml-2 flex flex-row gap-2"> <!-- Wounds -->
+              <div class="font-bold"> Wounds </div>
+              <input id="current_character_remaining_wounds" class="font-bold w-5 border-1 text-center"></input>
+              <div class="font-bold"> / </div>
+              <div id="current_character_total_wounds" class="font-bold"> 0 </div>
+            </div>
+            <div class="ml-2 flex flex-row gap-2"> <!-- Mettle -->
+              <div class="font-bold"> Mettle </div>
+              <input id="current_character_remaining_mettle" class="font-bold w-5 border-1 text-center"></input>
+              <div class="font-bold"> / </div>
+              <div id="current_character_total_mettle" class="font-bold"> 0 </div>
+            </div>
+            <div class="ml-2 flex flex-row gap-2"> <!-- Initiative -->
+              <div class="font-bold"> Initiative </div>
+              <div id="current_character_initiative_display" class="font-bold"> 0 </div>
+              <button id="current_character_roll_initiative"
+                class="border-1 border-black rounded-lg bg-[#305bab] text-white font-bold w-[5vw] hover:border-white">Roll</button>
+            </div>
+            <div class="ml-2 flex flex-row gap-2"> <!-- Armour -->
+              <div class="font-bold"> Armour </div>
+              <div id="current_character_armour_display" class="font-bold"> 0 </div>
+            </div>
+
+            <div class="ml-2 flex flex-row gap-2"> <!-- Melee -->
+              <div class="font-bold"> Melee </div>
+              <div id="current_character_melee_display" class="font-bold"> Poor </div>
+            </div>
+            <div class="ml-2 flex flex-row gap-2"> <!-- Accuracy -->
+              <div class="font-bold"> Accuracy </div>
+              <div id="current_character_accuracy_display" class="font-bold"> Poor </div>
+            </div>
+            <div class="ml-2 flex flex-row gap-2"> <!-- Defence -->
+              <div class="font-bold"> Defence </div>
+              <div id="current_character_defence_display" class="font-bold"> Poor </div>
+            </div>
+
+            <div class="ml-2 flex flex-row gap-2"> <!-- Mortally Wounded? -->
+              <div class="font-bold"> Mortally Wounded? </div>
+              <input id="current_character_mortally_wounded_display" type="checkbox"></input>
+            </div>
+            <div class="ml-2 flex flex-row gap-2"> <!-- Natural Awareness -->
+              <div class="font-bold"> Natural Awareness </div>
+              <div id="current_character_natural_awareness_display" class="font-bold"> 0 </div>
+            </div>
+          </div>
+          <div class="flex flex-col gap-5 place-items-center">
+            <div class="flex flex-row gap-5">
+              <div id="skill_roller_body" class="rounded-lg font-bold text-lg hover:text-white">Body</div>
+              <div id="skill_roller_mind" class="rounded-lg font-bold text-lg hover:text-white">Mind</div>
+              <div id="skill_roller_soul" class="rounded-lg font-bold text-lg hover:text-white">Soul</div>
+              <button id="roll_skill_button"
+                class="font-bold bg-[#305bab] rounded-lg w-25 text-white text-lg border-1 border-black hover:border-white">
+                Roll Skill </button>
+            </div>
+            <div id="skill_roller_table" class="grid grid-cols-5 grid-rows-5 gap-2 justify-items-center">
+
+            </div>
+            <div class="flex flex-row gap-2">
+              <div class="font-bold">Melee Weapon</div>
+              <button
+                class="font-bold bg-[#305bab] rounded-lg w-25 text-white text-lg border-1 border-black hover:border-white">
+                Roll to Hit </button>
+            </div>
+            <div class="flex flex-row gap-2">
+              <div class="font-bold">Ranged Weapon</div>
+              <button
+                class="font-bold bg-[#305bab] rounded-lg w-25 text-white text-lg border-1 border-black hover:border-white">
+                Roll to Hit </button>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="mr-2 ml-2 grid grid-cols-3">
         <div class="grid grid-cols-2 gap-2">

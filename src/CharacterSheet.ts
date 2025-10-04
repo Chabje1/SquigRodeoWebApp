@@ -68,7 +68,7 @@ export class SkillTable {
 }
 
 export class Attributes {
-    [key: string]: number | (() => number);
+    [key: string]: number;
 
     body: number;
     mind: number;

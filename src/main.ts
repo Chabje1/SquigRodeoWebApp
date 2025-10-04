@@ -171,6 +171,17 @@ function handleNewCharacter(name: string) {
    setActiveEditCharacter(name);
 }
 
+let currentlyPlayedEntity = "";
+let currentlyPlayedEntityType = "";
+
+function playCharacter() {
+   currentlyPlayedEntity = selectedCharacterName;
+   currentlyPlayedEntityType = "Player";
+}
+
+document.querySelector<HTMLButtonElement>("#play_character")!.addEventListener("click", playCharacter);
+
+
 function createCharacterButtonClick() {
 
    let name = prompt("Character Name")!;
@@ -345,7 +356,7 @@ function setCharacterSkillFocus(name: string, level: number) {
    updateRemainingXp();
 }
 
-function setupSkillTable() {
+function setupEditorSkillTable() {
    let placeHolderSkillTable = new SkillTable();
 
    let skillTableNameColumn = document.querySelector<HTMLDivElement>("#skill_table_name_column")!;
@@ -403,7 +414,99 @@ function setupSkillTable() {
    }
 }
 
-setupSkillTable()
+setupEditorSkillTable()
+
+// Skill Roller
+let rollerSelectedAttribute = "";
+
+function skillRollerAttributeClick(attributeName: string) {
+   if (rollerSelectedAttribute != "") {
+      let skillRollerPrev = document.querySelector<HTMLDivElement>("#skill_roller_" + rollerSelectedAttribute)!;
+
+      skillRollerPrev.classList.remove("border-1");
+   }
+
+   rollerSelectedAttribute = attributeName;
+
+   let skillRollerNext = document.querySelector<HTMLDivElement>("#skill_roller_" + rollerSelectedAttribute)!;
+
+   skillRollerNext.classList.add("border-1");
+}
+
+document.querySelector<HTMLDivElement>("#skill_roller_body")!.addEventListener("click", () => { skillRollerAttributeClick("body") });
+document.querySelector<HTMLDivElement>("#skill_roller_mind")!.addEventListener("click", () => { skillRollerAttributeClick("mind") });
+document.querySelector<HTMLDivElement>("#skill_roller_soul")!.addEventListener("click", () => { skillRollerAttributeClick("soul") });
+
+let rollerSelectedSkill = "";
+
+function skillRollerSkillClick(skillName: string) {
+   if (rollerSelectedSkill != "") {
+      let skillRollerPrev = document.querySelector<HTMLDivElement>("#skill_roller_" + rollerSelectedSkill)!;
+
+      skillRollerPrev.classList.remove("border-1");
+   }
+
+   rollerSelectedSkill = skillName;
+
+   let skillRollerNext = document.querySelector<HTMLDivElement>("#skill_roller_" + rollerSelectedSkill)!;
+
+   skillRollerNext.classList.add("border-1");
+}
+
+function setupSkillRoller() {
+   let placeHolderSkillTable = new SkillTable();
+
+   let skillRollerTable = document.querySelector<HTMLDivElement>("#skill_roller_table")!;
+
+   for (const skillName in placeHolderSkillTable) {
+
+      if (placeHolderSkillTable[skillName] instanceof Skill) {
+
+         // Add skill names
+         let textElement = document.createElement("p");
+
+         textElement.id = "skill_roller_" + skillName;
+
+         textElement.classList.add("flex", "items-center", "text-center", "font-bold", "text-sm", "hover:text-white", "rounded-lg");
+
+         textElement.textContent = toTitleCase(skillName.replace("_", " "));
+
+         textElement.addEventListener("click", () => { skillRollerSkillClick(skillName) });
+
+         skillRollerTable.appendChild(textElement);
+      }
+   }
+}
+
+setupSkillRoller()
+
+function rollSkillButtonClick() {
+   if (rollerSelectedAttribute == "" || rollerSelectedSkill == "") {
+      return;
+   }
+
+   let selectedCharacter = globalCharacterDictionary.get(currentlyPlayedEntity)!
+
+   let diceNumber: number = selectedCharacter.attributes[rollerSelectedAttribute] + selectedCharacter.skills[rollerSelectedSkill].training;
+
+
+   let rollResults = rollND6(diceNumber);
+   let message: HTMLParagraphElement = document.createElement("p")
+   let dn = document.querySelector<HTMLInputElement>("#diffNumHolder")!.valueAsNumber;
+
+   message.innerText = `${currentUserName} has rolled ${toTitleCase(rollerSelectedAttribute.replace("_", " "))}<${toTitleCase(rollerSelectedSkill.replace("_", " "))}>: ${rollResults}`;
+
+   if (dn != 0) {
+      let numberOfSuccesses = rollResults.filter((value) => { return value >= dn; }).length;
+
+      message.innerText += " = " + numberOfSuccesses.toString() + "S."
+   }
+
+   document.querySelector<HTMLDivElement>("#chatWindow")!.appendChild(message);
+}
+
+document.querySelector<HTMLButtonElement>("#roll_skill_button")!.addEventListener("click", rollSkillButtonClick)
+
 
 // Character Name
 function setCharacterName(this: HTMLInputElement): boolean {
