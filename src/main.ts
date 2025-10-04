@@ -6,12 +6,18 @@ function homeButtonClick() {
    document.querySelector<HTMLDivElement>('#home_screen')!.classList.remove("hidden");
    document.querySelector<HTMLDivElement>('#character_screen')!.classList.add("hidden");
    document.querySelector<HTMLDivElement>('#bestiary_screen')!.classList.add("hidden");
+
+   updatePlayedCharacterSheet();
 }
 
 function charactersButtonClick() {
    document.querySelector<HTMLDivElement>('#home_screen')!.classList.add("hidden");
    document.querySelector<HTMLDivElement>('#character_screen')!.classList.remove("hidden");
    document.querySelector<HTMLDivElement>('#bestiary_screen')!.classList.add("hidden");
+
+   if (selectedCharacterName != "") {
+      setActiveEditCharacter(selectedCharacterName)
+   }
 }
 
 function bestiaryButtonClick() {
@@ -859,3 +865,78 @@ function ltgTabClick() {
    document.querySelector<HTMLDivElement>('#ltg_tab_button')!.classList.add("bg-[#c6dcff]", "border-1", "border-black");
 }
 document.querySelector<HTMLButtonElement>("#ltg_tab_button")!.addEventListener("click", ltgTabClick);
+
+// Current Character
+function updatePlayedCharacterSheet() {
+   if (currentlyPlayedEntityType != "Player" || currentlyPlayedEntity == "") {
+      document.querySelector<HTMLDivElement>('#active_character_sheet')!.classList.add("hidden");
+      console.log("HIDE")
+   }
+   else {
+      document.querySelector<HTMLDivElement>('#active_character_sheet')!.classList.remove("hidden");
+      console.log("SHOW")
+
+      let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+
+      document.querySelector<HTMLDivElement>('#current_character_name')!.textContent = selectedCharacterName;
+
+      document.querySelector<HTMLInputElement>('#current_character_remaining_toughness')!.value = selectedCharacter.remaining_toughness.toString();
+      document.querySelector<HTMLDivElement>('#current_character_total_toughness')!.textContent = selectedCharacter.getTotalToughness().toString();
+
+      document.querySelector<HTMLInputElement>('#current_character_remaining_wounds')!.value = selectedCharacter.remaining_wounds.toString();
+      document.querySelector<HTMLDivElement>('#current_character_total_wounds')!.textContent = selectedCharacter.getTotalWounds().toString();
+
+      document.querySelector<HTMLInputElement>('#current_character_remaining_mettle')!.value = selectedCharacter.remaining_mettle.toString();
+      document.querySelector<HTMLDivElement>('#current_character_total_mettle')!.textContent = selectedCharacter.getTotalMettle().toString();
+
+      document.querySelector<HTMLDivElement>('#current_character_initiative_display')!.textContent = selectedCharacter.getInitiative().toString();
+
+      document.querySelector<HTMLDivElement>('#current_character_armour_display')!.textContent = selectedCharacter.armour.toString();
+
+      document.querySelector<HTMLDivElement>('#current_character_melee_display')!.textContent = selectedCharacter.getMeleeText();
+      document.querySelector<HTMLDivElement>('#current_character_accuracy_display')!.textContent = selectedCharacter.getAccuracyText();
+      document.querySelector<HTMLDivElement>('#current_character_defence_display')!.textContent = selectedCharacter.getDefenceText();
+
+      document.querySelector<HTMLInputElement>('#current_character_mortally_wounded_display')!.checked = selectedCharacter.is_mortally_wounded;
+
+      document.querySelector<HTMLInputElement>('#current_character_natural_awareness_display')!.textContent = selectedCharacter.getNaturalAwareness().toString();
+   }
+}
+
+updatePlayedCharacterSheet()
+
+// Active Character - Is Mortally Wounded
+function changeActiveCharacterMortallyWounded(this: HTMLInputElement) {
+   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+
+   selectedCharacter.is_mortally_wounded = this.checked;
+}
+
+document.querySelector<HTMLInputElement>('#current_character_mortally_wounded_display')!.addEventListener("change", changeActiveCharacterMortallyWounded);
+
+// Active Character - Remaining Toughness
+function changeActiveCharacterRemainingToughness(this: HTMLInputElement) {
+   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+
+   selectedCharacter.remaining_toughness = +this.value;
+}
+
+document.querySelector<HTMLInputElement>('#current_character_remaining_toughness')!.addEventListener("input", changeActiveCharacterRemainingToughness);
+
+// Active Character - Remaining Wounds
+function changeActiveCharacterRemainingWounds(this: HTMLInputElement) {
+   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+
+   selectedCharacter.remaining_wounds = +this.value;
+}
+
+document.querySelector<HTMLInputElement>('#current_character_remaining_wounds')!.addEventListener("input", changeActiveCharacterRemainingWounds);
+
+// Active Character - Remaining Mettle
+function changeActiveCharacterRemainingMettle(this: HTMLInputElement) {
+   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+
+   selectedCharacter.remaining_mettle = +this.value;
+}
+
+document.querySelector<HTMLInputElement>('#current_character_remaining_mettle')!.addEventListener("input", changeActiveCharacterRemainingMettle);

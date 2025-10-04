@@ -107,6 +107,7 @@ export class CharacterSheet {
     short_term_goal: string;
     long_term_goal: string;
     talents: { [name: string]: Talent };
+    is_mortally_wounded: boolean;
 
     constructor(name: string) {
         this.name = name;
@@ -122,6 +123,7 @@ export class CharacterSheet {
         this.short_term_goal = "";
         this.long_term_goal = "";
         this.talents = {};
+        this.is_mortally_wounded = false;
     }
 
     public calculateUsedXp(): number {
@@ -174,4 +176,25 @@ export class CharacterSheet {
     public getDefence(): number {
         return Math.floor((this.attributes.body + this.skills.reflexes.training - 1) / 2) + this.shield_bonus;
     }
+
+    public getMeleeText(): string {
+        return MAD_TEXT[this.getMelee()];
+    }
+
+    public getAccuracyText(): string {
+        return MAD_TEXT[this.getAccuracy()];
+    }
+
+    public getDefenceText(): string {
+        return MAD_TEXT[this.getDefence()];
+    }
 }
+
+const MAD_TEXT: Array<string> = [
+    "Poor",
+    "Average",
+    "Good",
+    "Great",
+    "Superb",
+    "Extraordinary",
+];
