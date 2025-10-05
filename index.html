@@ -124,15 +124,34 @@
             </div>
           </div>
           <div class="flex flex-col gap-5 place-items-center">
-            <div class="flex flex-row gap-5">
-              <div id="skill_roller_body" class="rounded-lg font-bold text-lg hover:text-white">Body</div>
-              <div id="skill_roller_mind" class="rounded-lg font-bold text-lg hover:text-white">Mind</div>
-              <div id="skill_roller_soul" class="rounded-lg font-bold text-lg hover:text-white">Soul</div>
+            <div class="flex flex-row ">
+              <div class="hidden md:flex flex-row gap-5">
+                <div id="skill_roller_body" class="rounded-lg font-bold text-lg hover:text-white">Body
+                </div>
+                <div id="skill_roller_mind" class="rounded-lg font-bold text-lg hover:text-white">Mind
+                </div>
+                <div id="skill_roller_soul" class="rounded-lg font-bold text-lg hover:text-white">Soul
+                </div>
+              </div>
+              <div class="flex md:hidden flex-row">
+                <select id="active_character_attribute_dropdown"
+                  class="w-[12vw] font-bold indent-1 bg-[#c6dcff] border-black border-1 rounded-lg">
+                  <option value="body">Body</option>
+                  <option value="mind">Mind</option>
+                  <option value="soul">Soul</option>
+                </select>
+
+                <select id="active_character_skill_dropdown"
+                  class="w-[12vw] font-bold indent-1 bg-[#c6dcff] border-black border-1 rounded-lg">
+                </select>
+              </div>
+
               <button id="roll_skill_button"
                 class="font-bold bg-[#305bab] rounded-lg w-25 text-white text-lg border-1 border-black hover:border-white">
                 Roll Skill </button>
             </div>
-            <div id="skill_roller_table" class="grid grid-cols-5 grid-rows-5 gap-2 justify-items-center">
+            <div id="skill_roller_table"
+              class="hidden md:grid lg:grid grid-cols-5 grid-rows-5 gap-2 justify-items-center">
 
             </div>
             <div class="flex flex-row gap-2">

@@ -65,6 +65,7 @@ function rollDiceAction() {
    let message: HTMLParagraphElement = document.createElement("p")
    let dn = document.querySelector<HTMLInputElement>("#diffNumHolder")!.valueAsNumber;
 
+   message.classList.add("text-sm");
    message.innerText = currentUserName + " has rolled " + rollResults.toString();
 
    if (dn != 0) {
@@ -427,7 +428,7 @@ function setupEditorSkillTable() {
 setupEditorSkillTable()
 
 // Skill Roller
-let rollerSelectedAttribute = "";
+let rollerSelectedAttribute = "body";
 
 function skillRollerAttributeClick(attributeName: string) {
    if (rollerSelectedAttribute != "") {
@@ -447,7 +448,12 @@ document.querySelector<HTMLDivElement>("#skill_roller_body")!.addEventListener("
 document.querySelector<HTMLDivElement>("#skill_roller_mind")!.addEventListener("click", () => { skillRollerAttributeClick("mind") });
 document.querySelector<HTMLDivElement>("#skill_roller_soul")!.addEventListener("click", () => { skillRollerAttributeClick("soul") });
 
-let rollerSelectedSkill = "";
+function skillRollerAttributeSelect(this: HTMLSelectElement) {
+   rollerSelectedAttribute = this.value;
+}
+document.querySelector<HTMLSelectElement>("#active_character_attribute_dropdown")!.addEventListener("change", skillRollerAttributeSelect)
+
+let rollerSelectedSkill = "arcana";
 
 function skillRollerSkillClick(skillName: string) {
    if (rollerSelectedSkill != "") {
@@ -463,10 +469,18 @@ function skillRollerSkillClick(skillName: string) {
    skillRollerNext.classList.add("border-1");
 }
 
+function skillRollerSkillSelect(this: HTMLSelectElement) {
+   rollerSelectedSkill = this.value;
+}
+document.querySelector<HTMLSelectElement>("#active_character_skill_dropdown")!.addEventListener("change", skillRollerSkillSelect)
+
+
 function setupSkillRoller() {
    let placeHolderSkillTable = new SkillTable();
 
    let skillRollerTable = document.querySelector<HTMLDivElement>("#skill_roller_table")!;
+
+   let skillRollerDropdown = document.querySelector<HTMLSelectElement>("#active_character_skill_dropdown")!;
 
    for (const skillName in placeHolderSkillTable) {
 
@@ -484,6 +498,13 @@ function setupSkillRoller() {
          textElement.addEventListener("click", () => { skillRollerSkillClick(skillName) });
 
          skillRollerTable.appendChild(textElement);
+
+         let optionElement = document.createElement("option");
+
+         optionElement.value = skillName;
+         optionElement.innerText = toTitleCase(skillName.replace("_", " "));
+
+         skillRollerDropdown.appendChild(optionElement);
       }
    }
 }
@@ -502,6 +523,9 @@ function rollSkillButtonClick() {
 
    let rollResults = rollND6(diceNumber);
    let message: HTMLParagraphElement = document.createElement("p")
+
+   message.classList.add("text-sm");
+
    let dn = document.querySelector<HTMLInputElement>("#diffNumHolder")!.valueAsNumber;
 
    message.innerText = `${currentUserName} has rolled ${toTitleCase(rollerSelectedAttribute.replace("_", " "))}<${toTitleCase(rollerSelectedSkill.replace("_", " "))}>: ${rollResults}`;
@@ -958,7 +982,9 @@ function broadcastMessage(msg: string) {
 
 function receiveMessage(event: { data: unknown; connectionId: string; }) {
 
-   let message: HTMLParagraphElement = document.createElement("p")
+   let message: HTMLParagraphElement = document.createElement("p");
+
+   message.classList.add("text-sm");
 
    message.innerText = event.data as string;
 
@@ -968,8 +994,16 @@ function receiveMessage(event: { data: unknown; connectionId: string; }) {
 }
 
 if (OBR.isAvailable) {
-   console.log("HELLO OBR!");
-   OBR.onReady(() => { OBR.broadcast.onMessage("squigrodeo.chat_message", receiveMessage); });
+
+   async function setUserName() {
+      currentUserName = await OBR.player.getName();
+      console.log(`HELLO ${currentUserName}!`);
+   }
+
+   OBR.onReady(() => {
+      OBR.broadcast.onMessage("squigrodeo.chat_message", receiveMessage);
+      setUserName();
+   });
 }
 else {
    console.log("OBR INTEGRATION DISABLED");
