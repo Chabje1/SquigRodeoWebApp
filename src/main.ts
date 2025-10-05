@@ -1,4 +1,4 @@
-import { CharacterSheet, SkillTable, Skill, Talent } from "./CharacterSheet";
+import { CharacterSheet, SkillTable, Skill, Talent, MAD_TEXT } from "./CharacterSheet";
 import { toTitleCase } from "./utilities";
 
 import OBR from "@owlbear-rodeo/sdk";
@@ -35,7 +35,7 @@ document.querySelector<HTMLButtonElement>("#bestiary_button")!.addEventListener(
 function logMessageToChat(msg: string) {
    let message: HTMLParagraphElement = document.createElement("p")
 
-   message.classList.add("text-sm");
+   message.classList.add("text-sm", "not-last:border-b-1");
 
    message.innerText = msg;
 
@@ -446,44 +446,12 @@ setupEditorSkillTable()
 // Skill Roller
 let rollerSelectedAttribute = "body";
 
-function skillRollerAttributeClick(attributeName: string) {
-   if (rollerSelectedAttribute != "") {
-      let skillRollerPrev = document.querySelector<HTMLDivElement>("#skill_roller_" + rollerSelectedAttribute)!;
-
-      skillRollerPrev.classList.remove("border-1");
-   }
-
-   rollerSelectedAttribute = attributeName;
-
-   let skillRollerNext = document.querySelector<HTMLDivElement>("#skill_roller_" + rollerSelectedAttribute)!;
-
-   skillRollerNext.classList.add("border-1");
-}
-
-document.querySelector<HTMLDivElement>("#skill_roller_body")!.addEventListener("click", () => { skillRollerAttributeClick("body") });
-document.querySelector<HTMLDivElement>("#skill_roller_mind")!.addEventListener("click", () => { skillRollerAttributeClick("mind") });
-document.querySelector<HTMLDivElement>("#skill_roller_soul")!.addEventListener("click", () => { skillRollerAttributeClick("soul") });
-
 function skillRollerAttributeSelect(this: HTMLSelectElement) {
    rollerSelectedAttribute = this.value;
 }
 document.querySelector<HTMLSelectElement>("#active_character_attribute_dropdown")!.addEventListener("change", skillRollerAttributeSelect)
 
 let rollerSelectedSkill = "arcana";
-
-function skillRollerSkillClick(skillName: string) {
-   if (rollerSelectedSkill != "") {
-      let skillRollerPrev = document.querySelector<HTMLDivElement>("#skill_roller_" + rollerSelectedSkill)!;
-
-      skillRollerPrev.classList.remove("border-1");
-   }
-
-   rollerSelectedSkill = skillName;
-
-   let skillRollerNext = document.querySelector<HTMLDivElement>("#skill_roller_" + rollerSelectedSkill)!;
-
-   skillRollerNext.classList.add("border-1");
-}
 
 function skillRollerSkillSelect(this: HTMLSelectElement) {
    rollerSelectedSkill = this.value;
@@ -494,8 +462,6 @@ document.querySelector<HTMLSelectElement>("#active_character_skill_dropdown")!.a
 function setupSkillRoller() {
    let placeHolderSkillTable = new SkillTable();
 
-   let skillRollerTable = document.querySelector<HTMLDivElement>("#skill_roller_table")!;
-
    let skillRollerDropdown = document.querySelector<HTMLSelectElement>("#active_character_skill_dropdown")!;
 
    for (const skillName in placeHolderSkillTable) {
@@ -503,18 +469,6 @@ function setupSkillRoller() {
       if (placeHolderSkillTable[skillName] instanceof Skill) {
 
          // Add skill names
-         let textElement = document.createElement("p");
-
-         textElement.id = "skill_roller_" + skillName;
-
-         textElement.classList.add("flex", "items-center", "text-center", "font-bold", "text-sm", "hover:text-white", "rounded-lg");
-
-         textElement.textContent = toTitleCase(skillName.replace("_", " "));
-
-         textElement.addEventListener("click", () => { skillRollerSkillClick(skillName) });
-
-         skillRollerTable.appendChild(textElement);
-
          let optionElement = document.createElement("option");
 
          optionElement.value = skillName;
@@ -910,11 +864,9 @@ document.querySelector<HTMLButtonElement>("#ltg_tab_button")!.addEventListener("
 function updatePlayedCharacterSheet() {
    if (currentlyPlayedEntityType != "Player" || currentlyPlayedEntity == "") {
       document.querySelector<HTMLDivElement>('#active_character_sheet')!.classList.add("hidden");
-      console.log("HIDE")
    }
    else {
       document.querySelector<HTMLDivElement>('#active_character_sheet')!.classList.remove("hidden");
-      console.log("SHOW")
 
       let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
 
@@ -993,6 +945,62 @@ function activeCharacterRollInitiative() {
 }
 
 document.querySelector<HTMLButtonElement>("#current_character_roll_initiative")!.addEventListener("click", activeCharacterRollInitiative);
+
+
+function getDNFromStatVsDefence(stat: number, defence: number): number {
+   if (stat - defence >= 2) {
+      return 2;
+   }
+   else if (stat - defence == 1) {
+      return 3;
+   }
+   else if (stat - defence == 0) {
+      return 4;
+   }
+   else if (stat - defence == -1) {
+      return 5;
+   }
+   else {
+      return 6;
+   }
+}
+
+function rollToHitMelee() {
+   let targetDefence = parseInt(document.querySelector<HTMLSelectElement>("#active_character_target_defence")!.value);
+
+   let selectedCharacter = globalCharacterDictionary.get(currentlyPlayedEntity)!
+
+   let difficultNumber = getDNFromStatVsDefence(selectedCharacter.getMelee(), targetDefence);
+
+   let diceNumber = selectedCharacter.attributes.body + selectedCharacter.skills.weapon_skill.training;
+
+   let rollResults = rollND6(diceNumber);
+
+   let numberOfSuccesses = rollResults.filter((value) => { return value >= difficultNumber; }).length;
+
+   sendMessageToChat(`${currentUserName} has attacked [M<${selectedCharacter.getMeleeText()}> vs D<${MAD_TEXT[targetDefence]}>]: ${rollResults} = ${numberOfSuccesses}S.`);
+}
+
+document.querySelector<HTMLButtonElement>("#active_character_roll_melee")!.addEventListener("click", rollToHitMelee)
+
+function rollToHitAccuracy() {
+   let targetDefence = parseInt(document.querySelector<HTMLSelectElement>("#active_character_target_defence")!.value);
+
+   let selectedCharacter = globalCharacterDictionary.get(currentlyPlayedEntity)!
+
+   let difficultNumber = getDNFromStatVsDefence(selectedCharacter.getAccuracy(), targetDefence);
+
+   let diceNumber = selectedCharacter.attributes.body + selectedCharacter.skills.ballistic_skill.training;
+
+   let rollResults = rollND6(diceNumber);
+
+   let numberOfSuccesses = rollResults.filter((value) => { return value >= difficultNumber; }).length;
+
+   sendMessageToChat(`${currentUserName} has attacked [A<${selectedCharacter.getAccuracyText()}> vs D<${MAD_TEXT[targetDefence]}>]: ${rollResults} = ${numberOfSuccesses}S.`);
+}
+
+document.querySelector<HTMLButtonElement>("#active_character_roll_ranged")!.addEventListener("click", rollToHitAccuracy)
+
 
 // ========================================================================================
 // OBR INTEGRATION

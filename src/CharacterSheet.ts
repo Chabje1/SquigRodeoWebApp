@@ -190,7 +190,7 @@ export class CharacterSheet {
     }
 }
 
-const MAD_TEXT: Array<string> = [
+export const MAD_TEXT: Array<string> = [
     "Poor",
     "Average",
     "Good",
