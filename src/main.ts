@@ -967,8 +967,10 @@ function receiveMessage(event: { data: unknown; connectionId: string; }) {
    console.log(`Received The Following Message: ${event.data}`)
 }
 
-OBR.broadcast.onMessage("squigrodeo.chat_message", receiveMessage);
-
 if (OBR.isAvailable) {
    console.log("HELLO OBR!");
+   OBR.onReady(() => { OBR.broadcast.onMessage("squigrodeo.chat_message", receiveMessage); });
+}
+else {
+   console.log("OBR INTEGRATION DISABLED");
 }
