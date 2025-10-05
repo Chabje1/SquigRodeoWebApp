@@ -108,7 +108,10 @@ function setActiveEditCharacter(charName: string) {
 
    document.querySelector<HTMLDivElement>("#edit_character_sheet")!.classList.remove("hidden");
    document.querySelector<HTMLButtonElement>("#export_character")!.classList.remove("hidden");
-   document.querySelector<HTMLButtonElement>("#play_character")!.classList.remove("hidden");
+
+   if (charName != currentlyPlayedEntity) {
+      document.querySelector<HTMLButtonElement>("#play_character")!.classList.remove("hidden");
+   }
 
    let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
 
@@ -204,6 +207,7 @@ let currentlyPlayedEntityType = "";
 function playCharacter() {
    currentlyPlayedEntity = selectedCharacterName;
    currentlyPlayedEntityType = "Player";
+   document.querySelector<HTMLButtonElement>("#play_character")!.classList.add("hidden");
 }
 
 document.querySelector<HTMLButtonElement>("#play_character")!.addEventListener("click", playCharacter);
