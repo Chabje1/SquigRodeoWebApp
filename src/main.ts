@@ -32,6 +32,26 @@ document.querySelector<HTMLButtonElement>("#home_button")!.addEventListener("cli
 document.querySelector<HTMLButtonElement>("#characters_button")!.addEventListener("click", charactersButtonClick)
 document.querySelector<HTMLButtonElement>("#bestiary_button")!.addEventListener("click", bestiaryButtonClick)
 
+function logMessageToChat(msg: string) {
+   let message: HTMLParagraphElement = document.createElement("p")
+
+   message.classList.add("text-sm");
+
+   message.innerText = msg;
+
+   let chatWindow = document.querySelector<HTMLDivElement>("#chatWindow")!;
+
+   chatWindow.appendChild(message);
+   chatWindow.scrollTo(0, chatWindow.scrollHeight);
+}
+
+function sendMessageToChat(msg: string) {
+   logMessageToChat(msg);
+
+   broadcastMessage(msg);
+}
+
+
 // Dice Button Logic
 let numDice: number = 0;
 let currentUserName: string = "Stellia";
@@ -62,21 +82,17 @@ function rollND6(N: number): Uint8Array {
 
 function rollDiceAction() {
    let rollResults = rollND6(numDice);
-   let message: HTMLParagraphElement = document.createElement("p")
    let dn = document.querySelector<HTMLInputElement>("#diffNumHolder")!.valueAsNumber;
 
-   message.classList.add("text-sm");
-   message.innerText = currentUserName + " has rolled " + rollResults.toString();
+   let message = currentUserName + " has rolled " + rollResults.toString();
 
    if (dn != 0) {
       let numberOfSuccesses = rollResults.filter((value) => { return value >= dn; }).length;
 
-      message.innerText += " = " + numberOfSuccesses.toString() + " successes."
+      message += " = " + numberOfSuccesses.toString() + " successes."
    }
 
-   document.querySelector<HTMLDivElement>("#chatWindow")!.appendChild(message);
-
-   broadcastMessage(message.innerText);
+   sendMessageToChat(message);
 }
 
 document.querySelector<HTMLButtonElement>("#numDiceIncreaseButton")!.addEventListener("click", increaseDiceNum)
@@ -522,23 +538,17 @@ function rollSkillButtonClick() {
 
 
    let rollResults = rollND6(diceNumber);
-   let message: HTMLParagraphElement = document.createElement("p")
-
-   message.classList.add("text-sm");
-
    let dn = document.querySelector<HTMLInputElement>("#diffNumHolder")!.valueAsNumber;
 
-   message.innerText = `${currentUserName} has rolled ${toTitleCase(rollerSelectedAttribute.replace("_", " "))}<${toTitleCase(rollerSelectedSkill.replace("_", " "))}>: ${rollResults}`;
+   let message = `${currentUserName} has rolled ${toTitleCase(rollerSelectedAttribute.replace("_", " "))}<${toTitleCase(rollerSelectedSkill.replace("_", " "))}>: ${rollResults}`;
 
    if (dn != 0) {
       let numberOfSuccesses = rollResults.filter((value) => { return value >= dn; }).length;
 
-      message.innerText += " = " + numberOfSuccesses.toString() + "S."
+      message += " = " + numberOfSuccesses.toString() + "S."
    }
 
-   document.querySelector<HTMLDivElement>("#chatWindow")!.appendChild(message);
-
-   broadcastMessage(message.innerText);
+   sendMessageToChat(message);
 }
 
 document.querySelector<HTMLButtonElement>("#roll_skill_button")!.addEventListener("click", rollSkillButtonClick)
@@ -971,6 +981,19 @@ function changeActiveCharacterRemainingMettle(this: HTMLInputElement) {
 
 document.querySelector<HTMLInputElement>('#current_character_remaining_mettle')!.addEventListener("input", changeActiveCharacterRemainingMettle);
 
+// Active Character - Roll Initiative
+function activeCharacterRollInitiative() {
+   let selectedCharacter = globalCharacterDictionary.get(currentlyPlayedEntity)!
+
+   let rollResults = rollND6(2);
+
+   const sum = rollResults.reduce((accumulator, currentValue) => accumulator + currentValue, 0) + selectedCharacter.getInitiative();
+
+   sendMessageToChat(`${currentUserName} has rolled Initiative: [${rollResults}] + ${selectedCharacter.getInitiative()} = ${sum}`);
+}
+
+document.querySelector<HTMLButtonElement>("#current_character_roll_initiative")!.addEventListener("click", activeCharacterRollInitiative);
+
 // ========================================================================================
 // OBR INTEGRATION
 // ========================================================================================
@@ -981,15 +1004,7 @@ function broadcastMessage(msg: string) {
 }
 
 function receiveMessage(event: { data: unknown; connectionId: string; }) {
-
-   let message: HTMLParagraphElement = document.createElement("p");
-
-   message.classList.add("text-sm");
-
-   message.innerText = event.data as string;
-
-   document.querySelector<HTMLDivElement>("#chatWindow")!.appendChild(message);
-
+   logMessageToChat(event.data as string);
    console.log(`Received The Following Message: ${event.data}`)
 }
 
