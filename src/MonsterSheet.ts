@@ -51,6 +51,6 @@ export class MonsterSheet {
         this.melee = 0;
         this.accuracy = 0;
         this.defence = 0;
-        this.attacks = new Map<string, Attack>();
+        this.attacks = {};
     }
 };
