@@ -59,8 +59,6 @@ function bestiaryButtonClick() {
    }
 }
 
-bestiaryButtonClick()
-
 document.querySelector<HTMLButtonElement>("#home_button")!.addEventListener("click", homeButtonClick)
 document.querySelector<HTMLButtonElement>("#characters_button")!.addEventListener("click", charactersButtonClick)
 document.querySelector<HTMLButtonElement>("#bestiary_button")!.addEventListener("click", bestiaryButtonClick)
