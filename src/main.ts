@@ -1,8 +1,35 @@
 import { CharacterSheet, SkillTable, Skill, Talent, MAD_TEXT } from "./CharacterSheet";
+import { MonsterSheet, Attack } from "./MonsterSheet";
 import { toTitleCase } from "./utilities";
 
 import OBR from "@owlbear-rodeo/sdk";
 
+// ------------- Editor Global States -------------
+
+// Active Entity Sheet
+let currentlyPlayedEntity = "";
+let currentlyPlayedEntityType = "";
+
+// Character Editor
+let globalCharacterDictionary = new Map<string, CharacterSheet>();
+let selectedCharacterName: string = "";
+
+// Monster Editor
+let globalMonsterDictionary = new Map<string, MonsterSheet>();
+let selectedMonsterName = "";
+
+// Dice Roller
+let numDice: number = 0;
+let currentUserName: string = "Stellia";
+
+// Skill Roller
+let rollerSelectedAttribute = "body";
+let rollerSelectedSkill = "arcana";
+
+// Active Talents
+let selectedTalentName = "";
+
+// ------------- Logic -------------
 // Menu Navigation Button Logic
 function homeButtonClick() {
    document.querySelector<HTMLDivElement>('#home_screen')!.classList.remove("hidden");
@@ -26,7 +53,13 @@ function bestiaryButtonClick() {
    document.querySelector<HTMLDivElement>('#home_screen')!.classList.add("hidden");
    document.querySelector<HTMLDivElement>('#character_screen')!.classList.add("hidden");
    document.querySelector<HTMLDivElement>('#bestiary_screen')!.classList.remove("hidden");
+
+   if (selectedMonsterName != "") {
+      setSelectedMonster(selectedMonsterName);
+   }
 }
+
+bestiaryButtonClick()
 
 document.querySelector<HTMLButtonElement>("#home_button")!.addEventListener("click", homeButtonClick)
 document.querySelector<HTMLButtonElement>("#characters_button")!.addEventListener("click", charactersButtonClick)
@@ -53,9 +86,6 @@ function sendMessageToChat(msg: string) {
 
 
 // Dice Button Logic
-let numDice: number = 0;
-let currentUserName: string = "Stellia";
-
 function increaseDiceNum() {
    numDice += 1
    document.querySelector<HTMLDivElement>("#numDiceView")!.textContent = numDice.toString();
@@ -100,9 +130,6 @@ document.querySelector<HTMLButtonElement>("#numDiceDecreaseButton")!.addEventLis
 document.querySelector<HTMLButtonElement>("#rollDiceButton")!.addEventListener("click", rollDiceAction)
 
 // Character List
-let globalCharacterDictionary = new Map<string, CharacterSheet>();
-let selectedCharacterName: string = "";
-
 function setActiveEditCharacter(charName: string) {
    selectedCharacterName = charName;
 
@@ -111,6 +138,9 @@ function setActiveEditCharacter(charName: string) {
 
    if (charName != currentlyPlayedEntity) {
       document.querySelector<HTMLButtonElement>("#play_character")!.classList.remove("hidden");
+   }
+   else {
+      document.querySelector<HTMLButtonElement>("#play_character")!.classList.add("hidden");
    }
 
    let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
@@ -201,11 +231,8 @@ function handleNewCharacter(name: string) {
    setActiveEditCharacter(name);
 }
 
-let currentlyPlayedEntity = "";
-let currentlyPlayedEntityType = "";
-
 function playCharacter() {
-   currentlyPlayedEntity = selectedCharacterName;
+   currentlyPlayedEntity = selectedCharacterName.slice(0);
    currentlyPlayedEntityType = "Player";
    document.querySelector<HTMLButtonElement>("#play_character")!.classList.add("hidden");
 }
@@ -292,30 +319,30 @@ function updateCharacterMelee() {
    let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
 
    for (let index = 0; index < 6; index++) {
-      document.querySelector<HTMLDivElement>("#melee_" + index.toString())!.classList.remove("bg-gray-500");
+      document.querySelector<HTMLDivElement>("#character_melee_" + index.toString())!.classList.remove("bg-gray-500");
    }
 
-   document.querySelector<HTMLDivElement>("#melee_" + selectedCharacter.getMelee().toString())!.classList.add("bg-gray-500");
+   document.querySelector<HTMLDivElement>("#character_melee_" + selectedCharacter.getMelee().toString())!.classList.add("bg-gray-500");
 }
 
 function updateCharacterAccuracy() {
    let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
 
    for (let index = 0; index < 6; index++) {
-      document.querySelector<HTMLDivElement>("#accuracy_" + index.toString())!.classList.remove("bg-gray-500");
+      document.querySelector<HTMLDivElement>("#character_accuracy_" + index.toString())!.classList.remove("bg-gray-500");
    }
 
-   document.querySelector<HTMLDivElement>("#accuracy_" + selectedCharacter.getAccuracy().toString())!.classList.add("bg-gray-500");
+   document.querySelector<HTMLDivElement>("#character_accuracy_" + selectedCharacter.getAccuracy().toString())!.classList.add("bg-gray-500");
 }
 
 function updateCharacterDefence() {
    let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
 
    for (let index = 0; index < 6; index++) {
-      document.querySelector<HTMLDivElement>("#defence_" + index.toString())!.classList.remove("bg-gray-500");
+      document.querySelector<HTMLDivElement>("#character_defence_" + index.toString())!.classList.remove("bg-gray-500");
    }
 
-   document.querySelector<HTMLDivElement>("#defence_" + selectedCharacter.getDefence().toString())!.classList.add("bg-gray-500");
+   document.querySelector<HTMLDivElement>("#character_defence_" + selectedCharacter.getDefence().toString())!.classList.add("bg-gray-500");
 }
 
 function updateRemainingXp() {
@@ -448,14 +475,10 @@ function setupEditorSkillTable() {
 setupEditorSkillTable()
 
 // Skill Roller
-let rollerSelectedAttribute = "body";
-
 function skillRollerAttributeSelect(this: HTMLSelectElement) {
    rollerSelectedAttribute = this.value;
 }
 document.querySelector<HTMLSelectElement>("#active_character_attribute_dropdown")!.addEventListener("change", skillRollerAttributeSelect)
-
-let rollerSelectedSkill = "arcana";
 
 function skillRollerSkillSelect(this: HTMLSelectElement) {
    rollerSelectedSkill = this.value;
@@ -661,8 +684,6 @@ document.querySelector<HTMLTextAreaElement>("#character_editor_stg_input")!.addE
 document.querySelector<HTMLTextAreaElement>("#character_editor_ltg_input")!.addEventListener("input", setLongTermGoal)
 
 // Talents Add/Remove
-let selectedTalentName = "";
-
 function setActiveEditTalent(name: string) {
    let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
    selectedTalentName = name;
@@ -872,9 +893,9 @@ function updatePlayedCharacterSheet() {
    else {
       document.querySelector<HTMLDivElement>('#active_character_sheet')!.classList.remove("hidden");
 
-      let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+      let selectedCharacter = globalCharacterDictionary.get(currentlyPlayedEntity)!;
 
-      document.querySelector<HTMLDivElement>('#current_character_name')!.textContent = selectedCharacterName;
+      document.querySelector<HTMLDivElement>('#current_character_name')!.textContent = selectedCharacter.name;
 
       document.querySelector<HTMLInputElement>('#current_character_remaining_toughness')!.value = selectedCharacter.remaining_toughness.toString();
       document.querySelector<HTMLDivElement>('#current_character_total_toughness')!.textContent = selectedCharacter.getTotalToughness().toString();
@@ -903,7 +924,7 @@ updatePlayedCharacterSheet()
 
 // Active Character - Is Mortally Wounded
 function changeActiveCharacterMortallyWounded(this: HTMLInputElement) {
-   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+   let selectedCharacter = globalCharacterDictionary.get(currentlyPlayedEntity)!;
 
    selectedCharacter.is_mortally_wounded = this.checked;
 }
@@ -912,7 +933,7 @@ document.querySelector<HTMLInputElement>('#current_character_mortally_wounded_di
 
 // Active Character - Remaining Toughness
 function changeActiveCharacterRemainingToughness(this: HTMLInputElement) {
-   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+   let selectedCharacter = globalCharacterDictionary.get(currentlyPlayedEntity)!;
 
    selectedCharacter.remaining_toughness = +this.value;
 }
@@ -921,7 +942,7 @@ document.querySelector<HTMLInputElement>('#current_character_remaining_toughness
 
 // Active Character - Remaining Wounds
 function changeActiveCharacterRemainingWounds(this: HTMLInputElement) {
-   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+   let selectedCharacter = globalCharacterDictionary.get(currentlyPlayedEntity)!;
 
    selectedCharacter.remaining_wounds = +this.value;
 }
@@ -930,7 +951,7 @@ document.querySelector<HTMLInputElement>('#current_character_remaining_wounds')!
 
 // Active Character - Remaining Mettle
 function changeActiveCharacterRemainingMettle(this: HTMLInputElement) {
-   let selectedCharacter = globalCharacterDictionary.get(selectedCharacterName)!;
+   let selectedCharacter = globalCharacterDictionary.get(currentlyPlayedEntity)!;
 
    selectedCharacter.remaining_mettle = +this.value;
 }
@@ -1005,6 +1026,453 @@ function rollToHitAccuracy() {
 
 document.querySelector<HTMLButtonElement>("#active_character_roll_ranged")!.addEventListener("click", rollToHitAccuracy)
 
+// ========================================================================================
+// Bestiary
+// ========================================================================================
+function setSelectedMonster(name: string) {
+   selectedMonsterName = name;
+
+   if (name == "") {
+      document.querySelector<HTMLDivElement>("#edit_monster_sheet")!.classList.add("hidden");
+      document.querySelector<HTMLButtonElement>("#export_monster")!.classList.add("hidden");
+      document.querySelector<HTMLButtonElement>("#add_monster_to_initiative")!.classList.add("hidden");
+   }
+   else {
+      let currentSelectedMonster = globalMonsterDictionary.get(name)!;
+
+      document.querySelector<HTMLDivElement>("#edit_monster_sheet")!.classList.remove("hidden");
+      document.querySelector<HTMLButtonElement>("#export_monster")!.classList.remove("hidden");
+      document.querySelector<HTMLButtonElement>("#add_monster_to_initiative")!.classList.remove("hidden");
+
+      // Name Row
+      document.querySelector<HTMLInputElement>("#monster_name_input")!.value = currentSelectedMonster.name;
+
+      // Monster Type Row
+      document.querySelector<HTMLSelectElement>("#monster_editor_size")!.value = currentSelectedMonster.size;
+      document.querySelector<HTMLInputElement>("#monster_editor_species")!.value = currentSelectedMonster.species;
+      document.querySelector<HTMLSelectElement>("#monster_editor_type")!.value = currentSelectedMonster.type;
+
+      // Monster Left Stats
+      document.querySelector<HTMLInputElement>("#monster_editor_initiative_input")!.value = currentSelectedMonster.initiative.toString();
+      document.querySelector<HTMLInputElement>("#monster_editor_toughness_input")!.value = currentSelectedMonster.total_toughness.toString();
+      document.querySelector<HTMLInputElement>("#monster_editor_wounds_input")!.value = currentSelectedMonster.total_wounds.toString();
+      document.querySelector<HTMLInputElement>("#monster_editor_mettle_input")!.value = currentSelectedMonster.total_mettle.toString();
+      document.querySelector<HTMLInputElement>("#monster_editor_armour_input")!.value = currentSelectedMonster.armour.toString();
+
+      // Monster Right Stats
+
+      // Melee
+      for (let index = 0; index < 6; index++) {
+         document.querySelector<HTMLDivElement>("#monster_melee_" + index.toString())!.classList.remove("bg-gray-500");
+      }
+
+      document.querySelector<HTMLDivElement>("#monster_melee_" + currentSelectedMonster.melee.toString())!.classList.add("bg-gray-500");
+
+      // Accuracy
+      for (let index = 0; index < 6; index++) {
+         document.querySelector<HTMLDivElement>("#monster_accuracy_" + index.toString())!.classList.remove("bg-gray-500");
+      }
+
+      document.querySelector<HTMLDivElement>("#monster_accuracy_" + currentSelectedMonster.accuracy.toString())!.classList.add("bg-gray-500");
+
+      // Defence
+      for (let index = 0; index < 6; index++) {
+         document.querySelector<HTMLDivElement>("#monster_defence_" + index.toString())!.classList.remove("bg-gray-500");
+      }
+
+      document.querySelector<HTMLDivElement>("#monster_defence_" + currentSelectedMonster.defence.toString())!.classList.add("bg-gray-500");
+
+      // Attacks
+      document.querySelector<HTMLTableElement>("#attack_list")!.replaceChildren();
+
+      for (const attackName in currentSelectedMonster.attacks) {
+         handleNewAttack(currentSelectedMonster.attacks[attackName]);
+      }
+   }
+}
+
+function handleNewMonster(name: string) {
+   let newOption: HTMLOptionElement = document.createElement("option");
+
+   // Character Dropdown
+   newOption.value = name;
+   newOption.innerText = name;
+
+   let monster_list = document.querySelector<HTMLSelectElement>("#monster_list_dropdown")!;
+
+   monster_list.appendChild(newOption);
+   monster_list.value = name;
+
+   // Activate Character
+   setSelectedMonster(name);
+}
+
+function addMonsterClick() {
+   let name = prompt("Monster Name")!;
+
+   while (globalMonsterDictionary.has(name)) {
+      alert("Error: Monster already exists.");
+      name = prompt("Monster Name")!;
+   }
+
+   // Character List Update
+   globalMonsterDictionary.set(name, new MonsterSheet(name));
+
+   selectedMonsterName = name;
+
+   handleNewMonster(name);
+}
+
+document.querySelector<HTMLButtonElement>("#add_monster")!.addEventListener("click", addMonsterClick);
+
+function removeMonsterClick() {
+   globalMonsterDictionary.delete(selectedMonsterName);
+
+   let monster_list = document.querySelector<HTMLSelectElement>("#monster_list_dropdown")!;
+
+   let selectedOptions = monster_list.selectedOptions;
+
+   for (let index = 0; index < selectedOptions.length; index++) {
+      monster_list.removeChild(selectedOptions[index]);
+   }
+
+   let newSelectedMonsterName = "";
+
+   if (monster_list.childElementCount > 0) {
+      newSelectedMonsterName = monster_list.options[0].value;
+   }
+
+   monster_list.value = newSelectedMonsterName;
+   setSelectedMonster(newSelectedMonsterName);
+}
+
+document.querySelector<HTMLButtonElement>("#remove_monster")!.addEventListener("click", removeMonsterClick);
+
+function onMonsterSelected(this: HTMLSelectElement) {
+   setSelectedMonster(this.value);
+}
+
+document.querySelector<HTMLSelectElement>("#monster_list_dropdown")!.addEventListener("change", onMonsterSelected);
+
+// --- Export/Import Monster --- 
+function exportMonster() {
+   let jsonString = JSON.stringify(globalMonsterDictionary.get(selectedMonsterName)!);
+
+   var a = document.createElement("a");
+   var file = new Blob([jsonString], { type: "application/json" });
+   a.href = URL.createObjectURL(file);
+   a.download = selectedMonsterName + ".json";
+   a.click();
+   URL.revokeObjectURL(a.href);
+}
+
+async function importMonster(this: HTMLInputElement) {
+   if (this.files && this.files.length === 1) {
+      let textPromise = await this.files[0].text();
+
+      let fileObject = JSON.parse(textPromise);
+      let importedMonster = new MonsterSheet(fileObject.name);
+
+      importedMonster = Object.assign(importedMonster, fileObject);
+
+      globalMonsterDictionary.set(importedMonster.name, importedMonster);
+
+      handleNewMonster(importedMonster.name);
+   }
+}
+
+function importMonsterClick() {
+   const elem = document.createElement("input");
+   elem.type = "file";
+   elem.accept = "json";
+   elem.addEventListener("change", importMonster);
+   elem.click();
+}
+
+document.querySelector<HTMLButtonElement>("#import_monster")!.addEventListener("click", importMonsterClick);
+document.querySelector<HTMLButtonElement>("#export_monster")!.addEventListener("click", exportMonster);
+
+// --- Monster Name Update --- 
+function setMonsterName(this: HTMLInputElement): boolean {
+   if (globalMonsterDictionary.get(this.value) !== undefined) {
+      alert("Error: Monster already exists.");
+      return false;
+   }
+
+   let selectedMonster = globalMonsterDictionary.get(selectedMonsterName)!;
+
+   selectedMonster.name = this.value;
+
+   globalMonsterDictionary.delete(selectedMonsterName)!;
+   globalMonsterDictionary.set(selectedMonster.name, selectedMonster);
+
+
+   let monster_list = document.querySelector<HTMLSelectElement>("#monster_list_dropdown")!;
+
+   for (var optionChild of monster_list.children) {
+      if ((optionChild as HTMLOptionElement).value == selectedMonsterName) {
+         (optionChild as HTMLOptionElement).value = selectedMonster.name;
+         (optionChild as HTMLOptionElement).innerText = selectedMonster.name;
+         break;
+      }
+   }
+
+   selectedMonsterName = selectedMonster.name;
+   monster_list.value = selectedMonsterName;
+
+   return true;
+}
+document.querySelector<HTMLInputElement>("#monster_name_input")!.addEventListener("input", setMonsterName);
+
+
+// --- Monster Type Row Updates --- 
+function updateMonsterSize(this: HTMLSelectElement) {
+   let selectedMonster = globalMonsterDictionary.get(selectedMonsterName)!;
+   selectedMonster.size = this.value;
+}
+document.querySelector<HTMLInputElement>("#monster_editor_size")!.addEventListener("change", updateMonsterSize);
+
+function updateMonsterSpecies(this: HTMLInputElement) {
+   let selectedMonster = globalMonsterDictionary.get(selectedMonsterName)!;
+   selectedMonster.species = this.value;
+}
+document.querySelector<HTMLInputElement>("#monster_editor_species")!.addEventListener("change", updateMonsterSpecies);
+
+function updateMonsterType(this: HTMLSelectElement) {
+   let selectedMonster = globalMonsterDictionary.get(selectedMonsterName)!;
+   selectedMonster.type = this.value;
+}
+document.querySelector<HTMLInputElement>("#monster_editor_type")!.addEventListener("change", updateMonsterType);
+
+
+// --- Monster Left Stats Updates --- 
+function updateMonsterInitiative(this: HTMLInputElement) {
+   let selectedMonster = globalMonsterDictionary.get(selectedMonsterName)!;
+   selectedMonster.initiative = +this.value;
+}
+document.querySelector<HTMLInputElement>("#monster_editor_initiative_input")!.addEventListener("input", updateMonsterInitiative);
+
+function updateMonsterTotalToughness(this: HTMLInputElement) {
+   let selectedMonster = globalMonsterDictionary.get(selectedMonsterName)!;
+   selectedMonster.total_toughness = +this.value;
+}
+document.querySelector<HTMLInputElement>("#monster_editor_toughness_input")!.addEventListener("input", updateMonsterTotalToughness);
+
+function updateMonsterTotalWounds(this: HTMLInputElement) {
+   let selectedMonster = globalMonsterDictionary.get(selectedMonsterName)!;
+   selectedMonster.total_wounds = +this.value;
+}
+document.querySelector<HTMLInputElement>("#monster_editor_wounds_input")!.addEventListener("input", updateMonsterTotalWounds);
+
+function updateMonsterTotalMettle(this: HTMLInputElement) {
+   let selectedMonster = globalMonsterDictionary.get(selectedMonsterName)!;
+   selectedMonster.total_mettle = +this.value;
+}
+document.querySelector<HTMLInputElement>("#monster_editor_mettle_input")!.addEventListener("input", updateMonsterTotalMettle);
+
+function updateMonsterArmour(this: HTMLInputElement) {
+   let selectedMonster = globalMonsterDictionary.get(selectedMonsterName)!;
+   selectedMonster.armour = +this.value;
+}
+document.querySelector<HTMLInputElement>("#monster_editor_armour_input")!.addEventListener("input", updateMonsterArmour);
+
+// --- Monster MAD Updates ---
+
+// Melee
+function updateMonsterMelee(this: HTMLDivElement) {
+   let melee_val = this.getAttribute("data-val")!;
+
+   let selectedMonster = globalMonsterDictionary.get(selectedMonsterName)!;
+   selectedMonster.melee = +melee_val;
+
+
+   for (let index = 0; index < 6; index++) {
+      document.querySelector<HTMLDivElement>("#monster_melee_" + index.toString())!.classList.remove("bg-gray-500");
+   }
+
+   document.querySelector<HTMLDivElement>("#monster_melee_" + melee_val)!.classList.add("bg-gray-500");
+}
+
+document.querySelector<HTMLDivElement>("#monster_melee_0")!.addEventListener("click", updateMonsterMelee);
+document.querySelector<HTMLDivElement>("#monster_melee_1")!.addEventListener("click", updateMonsterMelee);
+document.querySelector<HTMLDivElement>("#monster_melee_2")!.addEventListener("click", updateMonsterMelee);
+document.querySelector<HTMLDivElement>("#monster_melee_3")!.addEventListener("click", updateMonsterMelee);
+document.querySelector<HTMLDivElement>("#monster_melee_4")!.addEventListener("click", updateMonsterMelee);
+document.querySelector<HTMLDivElement>("#monster_melee_5")!.addEventListener("click", updateMonsterMelee);
+
+// Accuracy
+function updateMonsterAccuracy(this: HTMLDivElement) {
+   let accuracy_val = this.getAttribute("data-val")!;
+
+   let selectedMonster = globalMonsterDictionary.get(selectedMonsterName)!;
+   selectedMonster.accuracy = +accuracy_val;
+
+
+   for (let index = 0; index < 6; index++) {
+      document.querySelector<HTMLDivElement>("#monster_accuracy_" + index.toString())!.classList.remove("bg-gray-500");
+   }
+
+   document.querySelector<HTMLDivElement>("#monster_accuracy_" + accuracy_val)!.classList.add("bg-gray-500");
+}
+
+document.querySelector<HTMLDivElement>("#monster_accuracy_0")!.addEventListener("click", updateMonsterAccuracy);
+document.querySelector<HTMLDivElement>("#monster_accuracy_1")!.addEventListener("click", updateMonsterAccuracy);
+document.querySelector<HTMLDivElement>("#monster_accuracy_2")!.addEventListener("click", updateMonsterAccuracy);
+document.querySelector<HTMLDivElement>("#monster_accuracy_3")!.addEventListener("click", updateMonsterAccuracy);
+document.querySelector<HTMLDivElement>("#monster_accuracy_4")!.addEventListener("click", updateMonsterAccuracy);
+document.querySelector<HTMLDivElement>("#monster_accuracy_5")!.addEventListener("click", updateMonsterAccuracy);
+
+// Defence
+function updateMonsterDefence(this: HTMLDivElement) {
+   let defence_val = this.getAttribute("data-val")!;
+
+   let selectedMonster = globalMonsterDictionary.get(selectedMonsterName)!;
+   selectedMonster.defence = +defence_val;
+
+
+   for (let index = 0; index < 6; index++) {
+      document.querySelector<HTMLDivElement>("#monster_defence_" + index.toString())!.classList.remove("bg-gray-500");
+   }
+
+   document.querySelector<HTMLDivElement>("#monster_defence_" + defence_val)!.classList.add("bg-gray-500");
+}
+
+document.querySelector<HTMLDivElement>("#monster_defence_0")!.addEventListener("click", updateMonsterDefence);
+document.querySelector<HTMLDivElement>("#monster_defence_1")!.addEventListener("click", updateMonsterDefence);
+document.querySelector<HTMLDivElement>("#monster_defence_2")!.addEventListener("click", updateMonsterDefence);
+document.querySelector<HTMLDivElement>("#monster_defence_3")!.addEventListener("click", updateMonsterDefence);
+document.querySelector<HTMLDivElement>("#monster_defence_4")!.addEventListener("click", updateMonsterDefence);
+document.querySelector<HTMLDivElement>("#monster_defence_5")!.addEventListener("click", updateMonsterDefence);
+
+// --- Attacks --- 
+function deleteAttack(attack: Attack) {
+   console.log(attack.name.replace(" ", "_"))
+   document.querySelector<HTMLTableRowElement>("#attack_table_row_" + attack.name.replace(" ", "_"))!.remove();
+
+   let selectedMonster = globalMonsterDictionary.get(selectedMonsterName)!;
+   delete selectedMonster.attacks[attack.name];
+}
+
+function handleNewAttack(attack: Attack) {
+   let tableRow = document.createElement("tr");
+   tableRow.id = "attack_table_row_" + attack.name.replace(" ", "_");
+
+   // Name
+   let attackNameInput = document.createElement("input");
+   attackNameInput.classList.add("text-center");
+   attackNameInput.value = attack.name;
+
+   function updateAttackName(this: HTMLInputElement): boolean {
+      let selectedMonster = globalMonsterDictionary.get(selectedMonsterName)!;
+
+      if (selectedMonster.attacks[this.value] !== undefined) {
+         alert("Error: Attack already exists.");
+         return false;
+      }
+
+      delete selectedMonster.attacks[attack.name];
+
+      attack.name = this.value;
+
+      selectedMonster.attacks[attack.name] = attack;
+      return true;
+   }
+
+   attackNameInput.addEventListener("input", updateAttackName);
+
+   let rowHeader = document.createElement("th");
+   rowHeader.scope = "row"
+   rowHeader.appendChild(attackNameInput);
+
+   tableRow.appendChild(rowHeader);
+
+   // Damage
+   let damageInput = document.createElement("input");
+   damageInput.classList.add("text-center", "bg-[#c6dcff]", "border-black", "border-1", "rounded-lg", "w-1/2");
+   damageInput.value = attack.damage.toString();
+
+   function updateDamageValue(this: HTMLInputElement) {
+      attack.damage = +this.value;
+   }
+
+   damageInput.addEventListener("input", updateDamageValue)
+
+   {
+      let fieldTd = document.createElement("td");
+      fieldTd.appendChild(damageInput);
+
+      tableRow.appendChild(fieldTd);
+   }
+
+   // is Ranged
+   let isRangedInput = document.createElement("input");
+   isRangedInput.classList.add("text-center", "bg-[#c6dcff]", "border-black", "border-1", "rounded-lg", "w-1/2");
+   isRangedInput.type = "checkbox";
+   isRangedInput.checked = attack.is_ranged;
+
+   function updateIsRangedValue(this: HTMLInputElement) {
+      attack.is_ranged = this.checked;
+   }
+
+   isRangedInput.addEventListener("change", updateIsRangedValue)
+
+   {
+      let fieldTd = document.createElement("td");
+      fieldTd.appendChild(isRangedInput);
+
+      tableRow.appendChild(fieldTd);
+   }
+
+   // Focus
+   let focusInput = document.createElement("input");
+   focusInput.classList.add("text-center", "bg-[#c6dcff]", "border-black", "border-1", "rounded-lg", "w-1/2");
+   focusInput.value = attack.focus.toString();
+
+   function updateFocusValue(this: HTMLInputElement) {
+      attack.focus = +this.value;
+   }
+
+   focusInput.addEventListener("input", updateFocusValue)
+
+   {
+      let fieldTd = document.createElement("td");
+      fieldTd.appendChild(focusInput);
+
+      tableRow.appendChild(fieldTd);
+   }
+
+   // Delete
+   let deleteButton = document.createElement("button");
+   deleteButton.classList.add("bg-red-500", "text-white", "border-1", "rounded-lg", "border-black", "hover:border-white", "font-bold", "w-[4vw]");
+   deleteButton.textContent = "DEL";
+   deleteButton.addEventListener("click", () => { deleteAttack(attack) });
+
+   {
+      let fieldTd = document.createElement("td");
+      fieldTd.appendChild(deleteButton);
+
+      tableRow.appendChild(fieldTd);
+   }
+
+   document.querySelector<HTMLTableElement>("#attack_list")!.appendChild(tableRow);
+}
+
+function addAttackClick() {
+   let selectedMonster = globalMonsterDictionary.get(selectedMonsterName)!;
+
+   let name = prompt("Attack Name")!;
+
+   while (selectedMonster.attacks[name] !== undefined) {
+      alert("Error: Attack already exists.");
+      name = prompt("Attack Name")!;
+   }
+
+   let attack = new Attack(name);
+   selectedMonster.attacks[name] = attack;
+
+   handleNewAttack(attack);
+}
+document.querySelector<HTMLButtonElement>("#add_attack_button")!.addEventListener("click", addAttackClick);
 
 // ========================================================================================
 // OBR INTEGRATION

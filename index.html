@@ -326,34 +326,34 @@
               <div>
                 <div class="font-bold text-sm text-center">Melee</div>
                 <div class="flex flex-col border-1 border-black">
-                  <div id="melee_5" class="font-bold text-sm text-center">Extraordinary</div>
-                  <div id="melee_4" class="font-bold text-sm text-center">Superb</div>
-                  <div id="melee_3" class="font-bold text-sm text-center">Great</div>
-                  <div id="melee_2" class="font-bold text-sm text-center">Good</div>
-                  <div id="melee_1" class="font-bold text-sm text-center">Average</div>
-                  <div id="melee_0" class="font-bold text-sm text-center">Poor</div>
+                  <div id="character_melee_5" class="font-bold text-sm text-center">Extraordinary</div>
+                  <div id="character_melee_4" class="font-bold text-sm text-center">Superb</div>
+                  <div id="character_melee_3" class="font-bold text-sm text-center">Great</div>
+                  <div id="character_melee_2" class="font-bold text-sm text-center">Good</div>
+                  <div id="character_melee_1" class="font-bold text-sm text-center">Average</div>
+                  <div id="character_melee_0" class="font-bold text-sm text-center">Poor</div>
                 </div>
               </div>
               <div>
                 <div class="font-bold text-sm text-center">Accuracy</div>
                 <div class="flex flex-col border-1 border-black">
-                  <div id="accuracy_5" class="font-bold text-sm text-center">Extraordinary</div>
-                  <div id="accuracy_4" class="font-bold text-sm text-center">Superb</div>
-                  <div id="accuracy_3" class="font-bold text-sm text-center">Great</div>
-                  <div id="accuracy_2" class="font-bold text-sm text-center">Good</div>
-                  <div id="accuracy_1" class="font-bold text-sm text-center">Average</div>
-                  <div id="accuracy_0" class="font-bold text-sm text-center">Poor</div>
+                  <div id="character_accuracy_5" class="font-bold text-sm text-center">Extraordinary</div>
+                  <div id="character_accuracy_4" class="font-bold text-sm text-center">Superb</div>
+                  <div id="character_accuracy_3" class="font-bold text-sm text-center">Great</div>
+                  <div id="character_accuracy_2" class="font-bold text-sm text-center">Good</div>
+                  <div id="character_accuracy_1" class="font-bold text-sm text-center">Average</div>
+                  <div id="character_accuracy_0" class="font-bold text-sm text-center">Poor</div>
                 </div>
               </div>
               <div>
                 <div class="font-bold text-sm text-center">Defence</div>
                 <div class="flex flex-col border-1 border-black">
-                  <div id="defence_5" class="font-bold text-sm text-center">Extraordinary</div>
-                  <div id="defence_4" class="font-bold text-sm text-center">Superb</div>
-                  <div id="defence_3" class="font-bold text-sm text-center">Great</div>
-                  <div id="defence_2" class="font-bold text-sm text-center">Good</div>
-                  <div id="defence_1" class="font-bold text-sm text-center">Average</div>
-                  <div id="defence_0" class="font-bold text-sm text-center">Poor</div>
+                  <div id="character_defence_5" class="font-bold text-sm text-center">Extraordinary</div>
+                  <div id="character_defence_4" class="font-bold text-sm text-center">Superb</div>
+                  <div id="character_defence_3" class="font-bold text-sm text-center">Great</div>
+                  <div id="character_defence_2" class="font-bold text-sm text-center">Good</div>
+                  <div id="character_defence_1" class="font-bold text-sm text-center">Average</div>
+                  <div id="character_defence_0" class="font-bold text-sm text-center">Poor</div>
                 </div>
               </div>
             </div>
@@ -402,7 +402,132 @@
       </div>
     </div>
     <div id="bestiary_screen" class="h-[96vh]  w-full hidden">
+      <div class="mt-2 mr-2 ml-2 flex flex-1 items-center justify-center gap-2">
+        <button id="add_monster_to_initiative" title="Add Copy of Monster to Initiative"
+          class="hidden rounded-lg hover:bg-[#d0d0d0]"><i class="material-symbols-rounded">person_play</i></button>
+        <select id="monster_list_dropdown"
+          class="font-bold indent-1 w-1/5 bg-[#c6dcff] border-black border-1 rounded-lg">
+        </select>
+        <button id="add_monster" title="Create New Monster" class="rounded-lg hover:bg-[#d0d0d0]"><i
+            class="material-symbols-rounded">add</i></button>
+        <button id="remove_monster" title="Delete Monster" class="rounded-lg hover:bg-[#d0d0d0]"><i
+            class="material-symbols-rounded">remove</i></button>
+        <button id="import_monster" title="Import Monster" class="rounded-lg hover:bg-[#d0d0d0]"><i
+            class="material-symbols-rounded">
+            file_upload</i></button>
+        <button id="export_monster" title="Export Monster" class="hidden rounded-lg hover:bg-[#d0d0d0]"><i
+            class="material-symbols-rounded">
+            file_download</i></button>
+      </div>
 
+      <div id="edit_monster_sheet" class="grid grid-rows-[4vh_4vh_14vh_1fr] border-black rounded-lg border-1 gap-2 m-2">
+        <div class="flex indent-2 items-center font-bold gap-2">
+          <label for="monster_name_input">Monster Name: </label>
+          <input id="monster_name_input" class="w-1/4 border-1 border-black indent-1"></input>
+        </div>
+
+        <div class="grid grid-cols-3">
+          <div class="flex flex-row place-items-center justify-center gap-5">
+            <div class="font-bold">Size</div>
+            <select id="monster_editor_size" class="font-bold indent-1 bg-[#c6dcff] border-black border-1 rounded-lg">
+              <option value="Tiny">Tiny</option>
+              <option value="Small">Small</option>
+              <option value="Medium">Medium</option>
+              <option value="Large">Large</option>
+              <option value="Enormous">Enormous</option>
+              <option value="Monstrous">Monstrous</option>
+            </select>
+          </div>
+          <div class="flex flex-row place-items-center justify-center gap-5">
+            <div class="font-bold">Species</div>
+            <input id="monster_editor_species" class="bg-[#c6dcff] border-1 rounded-lg"></input>
+          </div>
+          <div class="flex flex-row place-items-center justify-center gap-5">
+            <div class="font-bold">Type</div>
+            <select id="monster_editor_type" class="font-bold indent-1 bg-[#c6dcff] border-black border-1 rounded-lg">
+              <option value="Automaton">Automaton</option>
+              <option value="Beast">Beast</option>
+              <option value="Daemon">Daemon</option>
+              <option value="Mortal">Mortal</option>
+              <option value="Spirit">Spirit</option>
+              <option value="Undead">Undead</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div class="grid grid-rows-5 grid-cols-[10vw_1fr]">
+            <div class="text-center font-bold">Initiative:</div>
+            <input id="monster_editor_initiative_input"
+              class="bg-[#c6dcff] border-black border-1 rounded-lg w-1/2"></input>
+            <div class="text-center font-bold">Toughness:</div>
+            <input id="monster_editor_toughness_input"
+              class="bg-[#c6dcff] border-black border-1 rounded-lg w-1/2"></input>
+            <div class="text-center font-bold">Wounds:</div>
+            <input id="monster_editor_wounds_input" class="bg-[#c6dcff] border-black border-1 rounded-lg w-1/2"></input>
+            <div class="text-center font-bold">Mettle:</div>
+            <input id="monster_editor_mettle_input" class="bg-[#c6dcff] border-black border-1 rounded-lg w-1/2"></input>
+            <div class="text-center font-bold">Armour:</div>
+            <input id="monster_editor_armour_input" class="bg-[#c6dcff] border-black border-1 rounded-lg w-1/2"></input>
+          </div>
+          <div class="grid grid-cols-3 gap-1">
+            <div>
+              <div class="font-bold text-sm text-center">Melee</div>
+              <div class="flex flex-col border-1 border-black">
+                <div id="monster_melee_5" data-val="5" class="font-bold text-sm text-center">Extraordinary</div>
+                <div id="monster_melee_4" data-val="4" class="font-bold text-sm text-center">Superb</div>
+                <div id="monster_melee_3" data-val="3" class="font-bold text-sm text-center">Great</div>
+                <div id="monster_melee_2" data-val="2" class="font-bold text-sm text-center">Good</div>
+                <div id="monster_melee_1" data-val="1" class="font-bold text-sm text-center">Average</div>
+                <div id="monster_melee_0" data-val="0" class="font-bold text-sm text-center">Poor</div>
+              </div>
+            </div>
+            <div>
+              <div class="font-bold text-sm text-center">Accuracy</div>
+              <div class="flex flex-col border-1 border-black">
+                <div id="monster_accuracy_5" data-val="5" class="font-bold text-sm text-center">Extraordinary</div>
+                <div id="monster_accuracy_4" data-val="4" class="font-bold text-sm text-center">Superb</div>
+                <div id="monster_accuracy_3" data-val="3" class="font-bold text-sm text-center">Great</div>
+                <div id="monster_accuracy_2" data-val="2" class="font-bold text-sm text-center">Good</div>
+                <div id="monster_accuracy_1" data-val="1" class="font-bold text-sm text-center">Average</div>
+                <div id="monster_accuracy_0" data-val="0" class="font-bold text-sm text-center">Poor</div>
+              </div>
+            </div>
+            <div>
+              <div class="font-bold text-sm text-center">Defence</div>
+              <div class="flex flex-col border-1 border-black">
+                <div id="monster_defence_5" data-val="5" class="font-bold text-sm text-center">Extraordinary</div>
+                <div id="monster_defence_4" data-val="4" class="font-bold text-sm text-center">Superb</div>
+                <div id="monster_defence_3" data-val="3" class="font-bold text-sm text-center">Great</div>
+                <div id="monster_defence_2" data-val="2" class="font-bold text-sm text-center">Good</div>
+                <div id="monster_defence_1" data-val="1" class="font-bold text-sm text-center">Average</div>
+                <div id="monster_defence_0" data-val="0" class="font-bold text-sm text-center">Poor</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <table class="[&_:is(th,td):where(:nth-child(2),:nth-child(4))]:text-center">
+          <thead>
+            <tr>
+              <th scope="col" class="text-center">Name</th>
+              <th scope="col" class="text-center">Damage (XD6)</th>
+              <th scope="col" class="text-center">Ranged?</th>
+              <th scope="col" class="text-center">Focus</th>
+            </tr>
+          </thead>
+          <tbody id="attack_list">
+          </tbody>
+          <tfoot>
+            <tr>
+              <th scope="row"><button id="add_attack_button"
+                  class="hover:border-white border-black border-1 bg-[#305bab] text-white font-bold h-[4vh] rounded-lg w-full justify-center text-[1.6vh]">Add
+                  Attack</button></th>
+            </tr>
+          </tfoot>
+        </table>
+
+      </div>
     </div>
   </div>
 </body>
