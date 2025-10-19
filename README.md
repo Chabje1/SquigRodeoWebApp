@@ -41,6 +41,3 @@ Rolls 2d6+Character's Initiative.
 ### Owlbear Rodeo Integration
 The web app can be imported into Owlbear Rodeo as an extension. 
 - Syncs chat messages between instances
-
-## Future Features
-- Initiative table
