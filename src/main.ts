@@ -1,7 +1,9 @@
 import { CharacterSheet, SkillTable, Skill, Talent, MAD_TEXT } from "./CharacterSheet";
 import { MonsterSheet, Attack } from "./MonsterSheet";
 import { toTitleCase } from "./utilities";
+import { InitiativeEntry, InitiativeUpdate, compareEntries } from "./Initiative";
 
+import { faker } from "@faker-js/faker";
 import OBR from "@owlbear-rodeo/sdk";
 
 // ------------- Editor Global States -------------
@@ -28,6 +30,11 @@ let rollerSelectedSkill = "arcana";
 
 // Active Talents
 let selectedTalentName = "";
+
+// Initiative
+let initiativeMap = new Map<string, InitiativeEntry>();
+let initiativeIndex = 0;
+let initiativeUid = "";
 
 // ------------- Logic -------------
 // Menu Navigation Button Logic
@@ -1152,6 +1159,20 @@ function onMonsterSelected(this: HTMLSelectElement) {
 
 document.querySelector<HTMLSelectElement>("#monster_list_dropdown")!.addEventListener("change", onMonsterSelected);
 
+function addMonsterToInitiative() {
+   let currentSelectedMonster = globalMonsterDictionary.get(selectedMonsterName)!;
+
+   let monsterCopy = new MonsterSheet("");
+
+   monsterCopy = Object.assign(monsterCopy, currentSelectedMonster);
+
+   monsterCopy.name = toTitleCase(faker.word.adjective()) + " " + monsterCopy.name;
+
+   handleNewEntry(new InitiativeEntry(monsterCopy.initiative, monsterCopy));
+}
+
+document.querySelector<HTMLButtonElement>("#add_monster_to_initiative")!.addEventListener("click", addMonsterToInitiative);
+
 // --- Export/Import Monster --- 
 function exportMonster() {
    let jsonString = JSON.stringify(globalMonsterDictionary.get(selectedMonsterName)!);
@@ -1472,20 +1493,192 @@ function addAttackClick() {
 }
 document.querySelector<HTMLButtonElement>("#add_attack_button")!.addEventListener("click", addAttackClick);
 
+// --------- Initiative ---------
+function renderInitiativeMap() {
+   let initiativeBox = document.querySelector<HTMLDivElement>("#initiative_box")!;
+
+   // Clear Existing Entries
+   while (initiativeBox.lastChild) {
+      initiativeBox.removeChild(initiativeBox.lastChild);
+   }
+
+   let initiativeOrder = [...initiativeMap.entries()];
+
+   initiativeOrder.sort(function (a, b) { return compareEntries(a[1], b[1]); });
+
+   for (let idx = 0; idx < initiativeOrder.length; ++idx) {
+      let uid = initiativeOrder[idx][0];
+      let entry = initiativeOrder[idx][1];
+
+      let entryHTML = document.createElement("div");
+      entryHTML.classList.add("grid", "grid-cols-[10vw_1fr]", "border-b-1", "border-black");
+
+      if (idx == initiativeIndex) {
+         entryHTML.classList.add("bg-[#72a6fa]");
+         initiativeUid = uid;
+      }
+
+      entryHTML.addEventListener("contextmenu", function (e) {
+         handleRemovingEntry(uid);
+         broadcastInitiativeUpdate(new InitiativeUpdate(uid, null));
+         e.preventDefault();
+      })
+
+      let entryHTMLInitiative = document.createElement("div");
+      entryHTMLInitiative.classList.add("text-center", "border-black", "border-r-2");
+      entryHTMLInitiative.textContent = entry.initiative_value.toString();
+
+      entryHTML.appendChild(entryHTMLInitiative);
+
+      let entryHTMLName = document.createElement("div");
+      entryHTMLName.classList.add("text-center");
+      entryHTMLName.textContent = entry.getName();
+
+      entryHTML.appendChild(entryHTMLName);
+
+      initiativeBox.appendChild(entryHTML);
+   }
+}
+
+function handleEntryUpdate(id: string, newEntry: InitiativeEntry) {
+   initiativeMap.set(id, newEntry);
+
+   renderInitiativeMap();
+}
+
+function handleNewEntry(newEntry: InitiativeEntry) {
+   let uid = crypto.randomUUID();
+
+   handleEntryUpdate(uid, newEntry);
+
+   broadcastInitiativeUpdate(new InitiativeUpdate(uid, newEntry));
+}
+
+function handleRemovingEntry(entryId: string) {
+   initiativeMap.delete(entryId);
+
+   renderInitiativeMap();
+}
+
+function handleInitiativeIndexChange() {
+   let entry = initiativeMap.get(initiativeUid)!;
+
+   if (entry.entity instanceof MonsterSheet) {
+      // Do Something
+   }
+   else if (globalCharacterDictionary.has(entry.entity)) {
+      currentlyPlayedEntityType = "Player";
+      currentlyPlayedEntity == entry.entity;
+
+      updatePlayedCharacterSheet();
+   }
+   else {
+      // Nothing to do
+   }
+}
+
+// Initiative Buttons
+function goToPreviousInitiative() {
+   if ((initiativeIndex--) == 0) {
+      initiativeIndex = initiativeMap.size - 1;
+   }
+
+   handleInitiativeIndexChange();
+
+   renderInitiativeMap();
+
+   broadcastInitiativeIndex();
+}
+
+document.querySelector<HTMLButtonElement>("#previous_initiative")!.addEventListener("click", goToPreviousInitiative);
+
+function resetInitiative() {
+   initiativeIndex = 0;
+
+   handleInitiativeIndexChange();
+
+   renderInitiativeMap();
+
+   broadcastInitiativeIndex();
+}
+
+document.querySelector<HTMLButtonElement>("#reset_initiative")!.addEventListener("click", resetInitiative);
+
+function goToNextInitiative() {
+   if ((++initiativeIndex) == initiativeMap.size) {
+      initiativeIndex = 0;
+   }
+
+   handleInitiativeIndexChange();
+
+   renderInitiativeMap();
+
+   broadcastInitiativeIndex();
+}
+
+document.querySelector<HTMLButtonElement>("#next_initiative")!.addEventListener("click", goToNextInitiative);
+
 // ========================================================================================
 // OBR INTEGRATION
 // ========================================================================================
+
+// TX
 function broadcastMessage(msg: string) {
    if (OBR.isAvailable && OBR.isReady) {
       OBR.broadcast.sendMessage("squigrodeo.chat_message", msg);
    }
 }
 
+function broadcastInitiativeUpdate(initiativeUpdate: InitiativeUpdate) {
+   if (OBR.isAvailable && OBR.isReady) {
+      OBR.broadcast.sendMessage("squigrodeo.initiative_update", initiativeUpdate);
+   }
+}
+
+function broadcastInitiativeIndex() {
+   if (OBR.isAvailable && OBR.isReady) {
+      OBR.broadcast.sendMessage("squigrodeo.set_initiative_index", initiativeIndex);
+   }
+}
+
+// RX
 function receiveMessage(event: { data: unknown; connectionId: string; }) {
    logMessageToChat(event.data as string);
    console.log(`Received The Following Message: ${event.data}`)
 }
 
+function receiveInitiativeUpdate(event: { data: unknown; connectionId: string; }) {
+   let entryUpdateData = (event.data as InitiativeUpdate);
+
+   let entryUpdate = new InitiativeUpdate(entryUpdateData.uid, entryUpdateData.value);
+
+   if (entryUpdateData.value != null) {
+      entryUpdate.value = new InitiativeEntry(entryUpdate.value!.initiative_value, entryUpdate.value!.entity);
+
+      if (typeof entryUpdate.value.entity != 'string') {
+         entryUpdate.value.entity = Object.assign(new MonsterSheet(""), entryUpdate.value.entity);
+      }
+
+      handleEntryUpdate(entryUpdate.uid, entryUpdate.value);
+      console.log("Adding New Entry");
+   }
+   else {
+      handleRemovingEntry(entryUpdate.uid);
+      console.log("Removing Entry");
+   }
+
+   console.log(`Received The Following Message: ${entryUpdateData}`)
+}
+
+function receiveSetInitiativeIndex(event: { data: unknown; connectionId: string; }) {
+   initiativeIndex = (event.data as number);
+
+   handleInitiativeIndexChange();
+
+   renderInitiativeMap();
+}
+
+// Setup
 if (OBR.isAvailable) {
 
    async function setUserName() {
@@ -1495,6 +1688,8 @@ if (OBR.isAvailable) {
 
    OBR.onReady(() => {
       OBR.broadcast.onMessage("squigrodeo.chat_message", receiveMessage);
+      OBR.broadcast.onMessage("squigrodeo.initiative_update", receiveInitiativeUpdate);
+      OBR.broadcast.onMessage("squigrodeo.set_initiative_index", receiveSetInitiativeIndex);
       setUserName();
    });
 }

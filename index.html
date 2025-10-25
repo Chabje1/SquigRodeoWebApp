@@ -63,9 +63,24 @@
               </div>
             </div>
           </div> <!-- DOOM END -->
-          <div class="flex flex-initial h-[35vh] rounded-lg bg-amber-300"> <!-- PARTY SHEET START -->
-            Party Sheet
-          </div> <!-- PARTY SHEET END -->
+          <div class="grid grid-rows-[3vh_3vh_1fr] h-[35vh] rounded-lg border-2 border-black">
+            <div class="grid grid-cols-3">
+              <button id="previous_initiative"
+                class="bg-[#305bab] hover:bg-[#3074ab] font-bold text-white text-center border-r-2 border-black">
+                Previous</button>
+              <button id="reset_initiative"
+                class="bg-[#305bab] hover:bg-[#3074ab] font-bold text-white text-center">Reset</button>
+              <button id="next_initiative"
+                class="bg-[#305bab] hover:bg-[#3074ab] font-bold text-white text-center border-l-2 border-black">Next
+              </button>
+            </div>
+            <div class="grid grid-cols-[10vw_1fr] border-t-2 border-b-2 border-black">
+              <div class="text-center bg-[#c6dcff] border-black border-r-2">Initiative</div>
+              <div class="text-center bg-[#c6dcff]">Name</div>
+            </div>
+            <div id="initiative_box" class="bg-[#c6dcff] overflow-y-auto">
+            </div>
+          </div>
         </div>
       </div>
       <div class="mr-2 ml-2 border-2 border-black rounded-lg h-[44vh]"> <!-- Active Character Sheet -->
@@ -420,7 +435,8 @@
             file_download</i></button>
       </div>
 
-      <div id="edit_monster_sheet" class="grid grid-rows-[4vh_4vh_14vh_1fr] border-black rounded-lg border-1 gap-2 m-2">
+      <div id="edit_monster_sheet"
+        class="hidden grid grid-rows-[4vh_4vh_14vh_1fr] border-black rounded-lg border-1 gap-2 m-2">
         <div class="flex indent-2 items-center font-bold gap-2">
           <label for="monster_name_input">Monster Name: </label>
           <input id="monster_name_input" class="w-1/4 border-1 border-black indent-1"></input>
